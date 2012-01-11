@@ -4,8 +4,6 @@ class Report < ActiveRecord::Base
   before_create :ensure_item
   after_create :update_report_count
 
-  scope :unprocessed, where("removed_by_moderator is null")
-
   def uid=(value)
     if !new_record? && self.uid != value
       raise "Can't update uid for existing record" 

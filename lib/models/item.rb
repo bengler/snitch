@@ -5,10 +5,12 @@ class Item < ActiveRecord::Base
 
   DECISIONS = ['removed', 'kept']
 
+  scope :unprocessed, where("decision is null")
+
   private
 
   def extract_realm
     klass, path, oid = Pebblebed::Uid.parse(self.uid)
-    realm = path.split('.').first
+    self.realm = path.split('.').first
   end
 end
