@@ -1,0 +1,7 @@
+collection :items => items do |item|
+  partial :item, :item => item
+end
+
+node :pagination => pagination do
+  attributes :limit, :offset, :last_page
+end

@@ -1,0 +1,3 @@
+node :item => item do
+  attributes :uid, :report_count, :decision, :created_at
+end
