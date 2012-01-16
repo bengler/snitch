@@ -54,7 +54,7 @@ class SnitchV1 < Sinatra::Base
 
   post '/items/:uid/decision' do |uid|
     require_god # TODO: Rather check that the user is a moderator of the current realm
-    decision = params[:decision].downcase.strip
+    decision = params[:item][:decision].downcase.strip
     halt 400, "Decision must be one of ${Item::DECISIONS.join(', ')}." unless Item::DECISIONS.include?(decision)
     item = Item.find_or_create_by_uid(uid)
     item.decision = decision
