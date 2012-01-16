@@ -12,6 +12,10 @@ class SnitchV1 < Sinatra::Base
   register Sinatra::Pebblebed
   i_am :snitch
 
+  declare_pebbles do
+    service 'checkpoint'
+  end
+
   helpers do
     def limit_offset_collection(collection, options)
       limit = (options[:limit] || 20).to_i
