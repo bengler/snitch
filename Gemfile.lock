@@ -1,8 +1,8 @@
 GIT
   remote: git@github.com:benglerpebbles/pebblebed.git
-  revision: f635b3a221ad4c88c6d5a0b3dfa04c704e3aeaf8
+  revision: c6ae83b2bfd59e1ecaaa87abe20a1b0b657b09f1
   specs:
-    pebblebed (0.0.4)
+    pebblebed (0.0.5)
       activesupport
       curb
       deepstruct
@@ -64,7 +64,7 @@ GEM
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
-    net-ssh (2.2.2)
+    net-ssh (2.3.0)
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
     nokogiri (1.5.0)
