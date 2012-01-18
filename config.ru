@@ -15,7 +15,3 @@ map "/api/snitch/v1" do
   use Rack::MethodOverride
   run SnitchV1
 end
-
-map '/ping' do
-  run lambda { |env| [200, {"Content-Type" => "application/json"}, [{name: "snitch"}.to_json]] }
-end

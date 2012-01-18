@@ -63,4 +63,21 @@ class SnitchV1 < Sinatra::Base
     item.save!
     pg :item, :locals => {:item => item}
   end
+
+  get '/ping' do
+    failures = []
+
+    begin
+      ActiveRecord::Base.verify_active_connections!
+      ActiveRecord::Base.connection.execute("select 1")
+    rescue Exception => e
+      failures << "ActiveRecord: #{e.message}"
+    end
+
+    if failures.empty?
+      halt 200, "snitch"
+    else
+      halt 503, failures.join("\n")
+    end
+  end
 end
