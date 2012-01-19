@@ -8,7 +8,15 @@ Dir.glob('./lib/**/*.rb').each{ |lib| require lib }
 $config = YAML::load(File.open("config/database.yml"))
 ENV['RACK_ENV'] ||= "development"
 environment = ENV['RACK_ENV']
-ActiveRecord::Base.establish_connection($config[environment])
+
+Hupper.on_initialize do
+  ActiveRecord::Base.establish_connection($config[environment])
+end
+
+Hupper.on_release do
+  ActiveRecord::Base.connection.disconnect!
+end
+
 
 Pebblebed.config do
 end
