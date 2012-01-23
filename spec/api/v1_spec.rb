@@ -14,7 +14,7 @@ describe 'API v1' do
 
     it "lets me report a decision on an unreported item" do 
       uid = "thing:thang$thong"
-      post "/items/#{uid}/decision", :decision => 'kept'
+      post "/items/#{uid}/decision", :item => {:decision => 'kept'}
       item = Item.first
       item.uid.should eq uid
       item.report_count.should eq 0
@@ -35,7 +35,7 @@ describe 'API v1' do
       oids.should eq ["9", "8", "7", "6", "5", "4", "3", "2", "1", "0"]
 
       # Register a decision and see the item is removed from the list
-      post "/items/thing:thang$5/decision", :decision => 'removed'
+      post "/items/thing:thang$5/decision", :item => {:decision => 'removed'}
       get "/items", :path => "thang"
       result = JSON.parse(last_response.body)
       oids = result['items'].map do |record|
@@ -45,11 +45,11 @@ describe 'API v1' do
     end
 
     it "only accepts valid decisions" do
-      post "/items/item:of$somesort/decision", :decision => 'kept'
+      post "/items/item:of$somesort/decision", :item => {:decision => 'kept'}
       last_response.status.should eq 200
-      post "/items/item:of$othersort/decision", :decision => 'removed'
+      post "/items/item:of$othersort/decision", :item => {:decision => 'removed'}
       last_response.status.should eq 200
-      post "/items/item:of$thirdkind/decision", :decision => 'beloved'
+      post "/items/item:of$thirdkind/decision", :item => {:decision => 'beloved'}
       last_response.status.should eq 400
     end
 
