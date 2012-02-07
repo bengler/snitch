@@ -86,6 +86,8 @@ GEM
     petroglyph (0.0.1)
       tilt
     pg (0.12.2)
+    pingable (0.0.9)
+      rack (>= 1.0.0)
     queryparams (0.0.3)
     rack (1.4.0)
     rack-protection (1.2.0)
@@ -139,6 +141,7 @@ DEPENDENCIES
   pebblebed!
   petroglyph
   pg
+  pingable
   rack-contrib!
   rack-test
   rake
