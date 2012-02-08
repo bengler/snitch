@@ -12,9 +12,8 @@ use Rack::CommonLogger
 
 Pingable.active_record_checks!
 
-
 map "/api/snitch/v1/ping" do
-  use Pingable::Handler, "snitch"
+  run Pingable::Handler.new("snitch")
 end
 
 map "/api/snitch/v1" do
