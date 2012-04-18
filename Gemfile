@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rake'
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'sinatra-activerecord'
+gem 'sinatra-activerecord', :require => false
 gem 'rack-contrib', :git => 'git://github.com/rack/rack-contrib.git'
 gem 'activerecord', :require => 'active_record'
 gem 'pg'
