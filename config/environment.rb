@@ -1,22 +1,13 @@
+require File.expand_path('config/site.rb') if File.exists?('config/site.rb')
+
 require "bundler"
 Bundler.require
-
-# $memcached = Dalli::Client.new
 
 Dir.glob('./lib/**/*.rb').each{ |lib| require lib }
 
 $config = YAML::load(File.open("config/database.yml"))
 ENV['RACK_ENV'] ||= "development"
 environment = ENV['RACK_ENV']
-
-Hupper.on_initialize do
-  ActiveRecord::Base.establish_connection($config[environment])
-end
-
-Hupper.on_release do
-  ActiveRecord::Base.connection.disconnect!
-end
-
 
 Pebblebed.config do
 end

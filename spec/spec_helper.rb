@@ -13,7 +13,6 @@ require 'config/environment'
 require 'rack/test'
 
 require 'api/v1'
-require 'config/logging'
 
 # require 'vcr'
 # VCR.config do |c|
