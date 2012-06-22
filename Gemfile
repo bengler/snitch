@@ -9,7 +9,7 @@ gem 'activerecord', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
-gem 'pebblebed', :git => 'git://github.com/benglerpebbles/pebblebed.git'
+gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
 gem 'bengler_test_helper',  :git => "git://github.com/origo/bengler_test_helper.git"
 
