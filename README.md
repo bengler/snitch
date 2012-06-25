@@ -38,6 +38,23 @@ remove the item from the default list returned by GET /items. Currently the user
 be god of the given realm, but this is just a temporary solution until we have a proper concept of "moderators".
 Both the decision and the decider is registered with the item in question.
 
+Optionally you can provide a "rationale" label to explain the reason for the decision. Defined rationales at this time 
+is (provided here with the norwegian translations used in Origo):
+
+    'unspecified' -> Uspesifisert
+    'practical' -> Praktiske årsaker
+    'relevance' -> Avsporing
+    'adhominem' -> Personangrep
+    'hatespeech' -> Hat-ytring
+    'doublepost' -> Dobbelposting
+    'legal' -> Mulig Lovbrudd
+    'rules' -> Brudd på medlemsavtalen
+    'advertising' -> Snikreklame
+
+Additionally you can provide a "message" which is an explanation of the decision. This should be directed at the
+offender as this message in the future may be sent to the original poster.
+
+
 
 ## Getting Started
 
