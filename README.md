@@ -31,11 +31,13 @@ options apply (`limit`, `offset`).
          }
        }
 
-The default scope is 'pending', meaning reported items that are undecided still. Other possible scopes that can be
-specified:
+Optionally you can provide a :scope for the request:
 
-    'fresh': Any fresh content that has not been marked as seen by a moderator       
+    'pending': (default) Any reported items that have no registered decision
+    'processed': Items that have been decided upon
     'reported': All reported items, including items that have recieved a decision
+    'fresh': Any fresh content that has not been marked as seen by a moderator       
+
 
 Notify snitch of the existence of an item:
 

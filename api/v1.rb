@@ -53,6 +53,8 @@ class SnitchV1 < Sinatra::Base
       items = items.fresh
     elsif params[:scope] == 'reported'
       items = items.reported
+    elsif params[:scope] == 'processed'
+      items = items.processed
     elsif params[:scope] == 'pending'
       items = items.unprocessed.reported
     else
