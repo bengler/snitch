@@ -87,7 +87,8 @@ CREATE TABLE items (
     label_8 text,
     label_9 text,
     klass text,
-    oid text
+    oid text,
+    seen boolean DEFAULT false
 );
 
 

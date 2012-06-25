@@ -1,7 +1,7 @@
 class Action < ActiveRecord::Base
   belongs_to :item, :touch => :action_at
   
-  KINDS = ['removed', 'kept', 'edited']
+  KINDS = ['removed', 'kept', 'edited', 'seen']
 
   RATIONALES = ['practical', 'relevance', 'adhominem', 'hatespeech', 'doublepost', 'legal', 'advertising', 'policy']
 
@@ -19,6 +19,7 @@ class Action < ActiveRecord::Base
   # Apply action to item if the kind is a valid decision
   def apply_decision
     if Item::DECISIONS.include?(self.kind)
+      item.seen = true
       item.decision = self.kind
       item.decider = self.identity
       item.save!

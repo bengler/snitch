@@ -18,6 +18,8 @@ class CreateActions < ActiveRecord::Migration
     end
 
     rename_column :items, :decision_at, :action_at
+
+    add_column :items, :seen, :boolean, :default => false
   end
 
   def self.down

@@ -30,12 +30,27 @@ options apply (`limit`, `offset`).
            "last_page": <more content? true/false>
          }
        }
+
+The default scope is 'pending', meaning reported items that are undecided still. Other possible scopes that can be
+specified:
+
+    'fresh': Any fresh content that has not been marked as seen by a moderator       
+    'reported': All reported items, including items that have recieved a decision
+
+Notify snitch of the existence of an item:
+
+    POST /items/:uid
+
+This is used to notify snitch of the existence of new content. Some moderators like to review new content as it 
+arrives. Go figure. To let snitch know a moderator has seen an item, post an action of the kind "seen". (Any
+other action will also mark the item as seen.)
+
             
 Register a moderator decision:
 
     POST /items/:uid/actions (post data: {"action": {"kind": <a valid decision label>})
 
-Actions are either 'kept', 'removed' or 'edited'. Actual removal of content is not performed by snitch, but this will
+Actions are either 'kept', 'removed', 'seen' or 'edited'. Actual removal of content is not performed by snitch, but this will
 remove the item from the default list returned by GET /items. Currently the user reporting a decision must 
 be god of the given realm, but this is just a temporary solution until we have a proper concept of "moderators".
 Both the decision and the decider is registered with the item in question.

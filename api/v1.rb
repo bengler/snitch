@@ -48,9 +48,24 @@ class SnitchV1 < Sinatra::Base
     require_parameters(params, :path) unless path
     items = Item.by_path(path).order("created_at desc")
     items = items.where(:klass => klass) unless klass == '*'
-    items = items.unprocessed unless params[:include_processed] && params[:include_processed] != 'false'
+    params[:scope] ||= 'pending'
+    if params[:scope] == 'fresh'
+      items = items.fresh
+    elsif params[:scope] == 'reported'
+      items = items.reported
+    elsif params[:scope] == 'pending'
+      items = items.unprocessed.reported
+    else
+      halt 400, "Unknown scope #{params[:scope]}"
+    end
     items, pagination = limit_offset_collection(items, params)
     pg :items, :locals => {:items => items, :pagination => pagination}
+  end
+
+  post '/items/:uid' do
+    require_god
+    item = Item.find_or_create_by_uid(uid)
+    pg :item, :locals => {:item => item}
   end
 
   post '/items/:uid/actions' do |uid|
