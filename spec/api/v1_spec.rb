@@ -27,6 +27,7 @@ describe 'API v1' do
       10.times do |i|
         post "/reports/thing:thang$#{i}"
       end
+      post "/reports/thing:thang.thong$13666"
       get "/items", :path => "thang"
       result = JSON.parse(last_response.body)
       oids = result['items'].map do |record|

@@ -42,10 +42,7 @@ class SnitchV1 < Sinatra::Base
   get '/items' do
     require_god # TODO: Rather check that the user is a moderator
     require_parameters(params, :path)
-    labels = params[:path].split('.')
-    halt 500, "At present paths may only be one deep (realm)" if labels.size > 1
-    realm = labels.first
-    items = Item.where("realm = ?", realm).order("created_at desc")
+    items = Item.by_path(params[:path]).order("created_at desc")
     items = items.unprocessed unless params[:include_processed] && params[:include_processed] != 'false'
     items, pagination = limit_offset_collection(items, params)
     pg :items, :locals => {:items => items, :pagination => pagination}

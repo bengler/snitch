@@ -12,6 +12,7 @@ gem 'petroglyph'
 gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
 gem 'bengler_test_helper',  :git => "git://github.com/origo/bengler_test_helper.git"
+gem 'pebble_path'
 
 group :development, :test do
   gem 'rspec', '~> 2.8'

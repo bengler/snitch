@@ -62,6 +62,8 @@ GEM
       net-ssh (>= 1.99.1)
     nokogiri (1.5.4)
     pathbuilder (0.0.2)
+    pebble_path (0.0.2)
+      pebblebed (>= 0.0.15)
     pebblebed (0.0.18)
       activesupport
       curb (>= 0.7.14)
@@ -124,6 +126,7 @@ DEPENDENCIES
   bengler_test_helper!
   capistrano (~> 2.9.0)
   capistrano-bengler!
+  pebble_path
   pebblebed
   petroglyph
   pg
