@@ -39,10 +39,15 @@ class SnitchV1 < Sinatra::Base
     [200, "Ok"]
   end
 
-  get '/items' do
+  get '/items/?:uid?' do
     require_god # TODO: Rather check that the user is a moderator
-    require_parameters(params, :path)
-    items = Item.by_path(params[:path]).order("created_at desc")
+    klass = '*'
+    oid = nil
+    path = params[:path]
+    klass, path, oid = Pebblebed::Uid.raw_parse(params[:uid]) if params[:uid]
+    require_parameters(params, :path) unless path
+    items = Item.by_path(path).order("created_at desc")
+    items = items.where(:klass => klass) unless klass == '*'
     items = items.unprocessed unless params[:include_processed] && params[:include_processed] != 'false'
     items, pagination = limit_offset_collection(items, params)
     pg :items, :locals => {:items => items, :pagination => pagination}

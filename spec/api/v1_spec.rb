@@ -47,6 +47,24 @@ describe 'API v1' do
       oids.should eq ["9", "8", "7", "6", "4", "3", "2", "1", "0"] # < with '5' removed
     end
 
+    it "supports querying items by uid" do
+      post "/reports/klass1:apdm.calendar$1"
+      post "/reports/klass2:apdm.calendar$2"
+      post "/reports/klass2:apdm.blogs$3"
+
+      get "/items/*:apdm.*"
+      JSON.parse(last_response.body)['items'].size.should eq 3
+
+      get "/items/*:mittap.*"
+      JSON.parse(last_response.body)['items'].size.should eq 0
+
+      get "/items/klass2:*"
+      JSON.parse(last_response.body)['items'].size.should eq 2
+
+      get "/items/klass2:apdm.blogs"
+      JSON.parse(last_response.body)['items'].size.should eq 1
+    end
+
     it "only accepts valid decisions" do
       post "/items/item:of$somesort/decision", :item => {:decision => 'kept'}
       last_response.status.should eq 200
