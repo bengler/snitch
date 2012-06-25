@@ -12,13 +12,15 @@ Report an object as objectionable. Uses checkpoint to attach a user to the repor
 Return a paginated list of unprocessed reported content that the moderator should respond to. The common pagination 
 options apply (`limit`, `offset`).
 
-    GET /items?path=<realm>&limit=<limit>&offset=<offset>
+    GET /items/:wildcard_uid&limit=<limit>&offset=<offset>
     => {
          "items": [
            {item: 
              {"uid": <uid of reported object>, 
-              "report_count": <number of reports> 
-              "decision": <moderator decision (always null)>
+              "report_count": <number of reports>,
+              "decision": <moderator decision>,
+              "decider": <identity id of decider>,
+              "action_at": <time of last moderator action on this object>,
               "created_at": <time of first report or moderator decision>}
            }, 
          ... (list of items) ],
@@ -31,17 +33,16 @@ options apply (`limit`, `offset`).
             
 Register a moderator decision:
 
-    POST /items/:uid/decision (post data: {"decision": <a valid decision label>})
+    POST /items/:uid/actions (post data: {"action": {"kind": <a valid decision label>})
 
-Decisions are either 'kept' or 'removed'. Actual removal of content is not performed by snitch, but this will
+Actions are either 'kept', 'removed' or 'edited'. Actual removal of content is not performed by snitch, but this will
 remove the item from the default list returned by GET /items. Currently the user reporting a decision must 
 be god of the given realm, but this is just a temporary solution until we have a proper concept of "moderators".
 Both the decision and the decider is registered with the item in question.
 
-Optionally you can provide a "rationale" label to explain the reason for the decision. Defined rationales at this time 
+Optionally you can provide a "rationale" label to explain the reason for the action. Defined rationales at this time 
 is (provided here with the norwegian translations used in Origo):
 
-    'unspecified' -> Uspesifisert
     'practical' -> Praktiske årsaker
     'relevance' -> Avsporing
     'adhominem' -> Personangrep
@@ -51,9 +52,15 @@ is (provided here with the norwegian translations used in Origo):
     'rules' -> Brudd på medlemsavtalen
     'advertising' -> Snikreklame
 
-Additionally you can provide a "message" which is an explanation of the decision. This should be directed at the
-offender as this message in the future may be sent to the original poster.
+Additionally you can provide a "message" which is a human readable explanation of the action. This should be directed at the
+offender as this message in the future may be provided to the original poster.
 
+Get lists of moderator decisions:
+
+    GET /items/:wildcard_uid/actions&limit=<limit>&offset=<offset>
+
+Returns a paginated list of recent actions on items matching the wildcard uid sorted by date. By default this will only
+go as far back as 30 days for performance reasons. By passing a date to the parameter :since you may page even further back.
 
 
 ## Getting Started
