@@ -66,7 +66,7 @@ class SnitchV1 < Sinatra::Base
 
   post '/items/:uid' do
     require_god
-    item = Item.find_or_create_by_uid(uid)
+    item = Item.find_or_create_by_uid(params[:uid])
     pg :item, :locals => {:item => item}
   end
 
