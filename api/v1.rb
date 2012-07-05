@@ -64,15 +64,15 @@ class SnitchV1 < Sinatra::Base
     pg :items, :locals => {:items => items, :pagination => pagination}
   end
 
-  post '/items/:uid' do
+  post '/items/:uid' do |uid|
     require_god
-    item = Item.find_or_create_by_uid(params[:uid])
+    item = Item.find_or_create_by_uid(uid)
     pg :item, :locals => {:item => item}
   end
 
   post '/items/:uid/actions' do |uid|
     require_god
-    halt 400, "Decision must be one of ${Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])    
+    halt 400, "Decision must be one of #{Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])    
     action = nil
     ActiveRecord::Base.connection.transaction do
       item = Item.find_or_create_by_uid(uid)
