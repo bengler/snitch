@@ -18,6 +18,11 @@ class Action < ActiveRecord::Base
 
   # Apply action to item if the kind is a valid decision
   def apply_decision
+    if kind == 'seen'
+      item.seen = true
+      item.save!
+    end
+
     if Item::DECISIONS.include?(self.kind)
       item.seen = true
       item.decision = self.kind
