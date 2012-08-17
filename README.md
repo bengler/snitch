@@ -12,7 +12,7 @@ Report an object as objectionable. Uses checkpoint to attach a user to the repor
 Return a paginated list of unprocessed reported content that the moderator should respond to. The common pagination 
 options apply (`limit`, `offset`).
 
-    GET /items/:wildcard_uid&limit=<limit>&offset=<offset>
+    GET /items/:wildcard_path&limit=<limit>&offset=<offset>
     => {
          "items": [
            {item: 
