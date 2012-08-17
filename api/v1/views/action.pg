@@ -1,0 +1,3 @@
+node :action => action do
+  attributes :uid, :kind, :rationale, :message, :identity
+end

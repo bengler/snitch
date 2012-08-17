@@ -11,6 +11,7 @@ gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
 gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
+gem 'pebble_path'
 gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git"
 
 group :development, :test do
