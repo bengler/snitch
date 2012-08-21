@@ -18,8 +18,8 @@ group :development, :test do
   gem 'rspec', '~> 2.8'
   gem 'rack-test'
   gem 'simplecov'
-  gem 'capistrano', '~> 2.9.0'
-  gem 'capistrano-bengler', :git => "git@github.com:bengler/capistrano-bengler.git"
+  gem 'capistrano', '~> 2.9.0', :require => false
+  gem 'capistrano-bengler', :git => "git@github.com:bengler/capistrano-bengler.git", :require => false
   # gem 'vcr'
   # gem 'webmock'
   # gem 'timecop'
