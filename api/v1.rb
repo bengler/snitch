@@ -28,7 +28,6 @@ class SnitchV1 < Sinatra::Base
   end  
 
   post '/reports/:uid' do |uid|
-    require_identity
     existing_report = begin
       # Only look for existing reports for logged in users
       if current_identity[:id]
