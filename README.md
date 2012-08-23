@@ -9,20 +9,20 @@ Report an object as objectionable. Uses checkpoint to attach a user to the repor
 
     POST /reports/:uid
 
-Return a paginated list of unprocessed reported content that the moderator should respond to. The common pagination 
+Return a paginated list of unprocessed reported content that the moderator should respond to. The common pagination
 options apply (`limit`, `offset`).
 
     GET /items/:wildcard_path&limit=<limit>&offset=<offset>
     => {
          "items": [
-           {item: 
-             {"uid": <uid of reported object>, 
+           {item:
+             {"uid": <uid of reported object>,
               "report_count": <number of reports>,
               "decision": <moderator decision>,
               "decider": <identity id of decider>,
               "action_at": <time of last moderator action on this object>,
               "created_at": <time of first report or moderator decision>}
-           }, 
+           },
          ... (list of items) ],
          "pagination": {
            "limit": <limit>,
@@ -36,28 +36,30 @@ Optionally you can provide a :scope for the request:
     'pending': (default) Any reported items that have no registered decision
     'processed': Items that have been decided upon
     'reported': All reported items, including items that have recieved a decision
-    'fresh': Any fresh content that has not been marked as seen by a moderator       
+    'fresh': Any fresh content that has not been marked as seen by a moderator
 
 
 Notify snitch of the existence of an item:
 
     POST /items/:uid
 
-This is used to notify snitch of the existence of new content. Some moderators like to review new content as it 
+This is used to notify snitch of the existence of new content. Some moderators like to review new content as it
 arrives. Go figure. To let snitch know a moderator has seen an item, post an action of the kind "seen". (Any
 other action will also mark the item as seen.)
 
-            
+
 Register a moderator decision:
 
     POST /items/:uid/actions (post data: {"action": {"kind": <a valid decision label>})
 
-Actions are either 'kept', 'removed', 'seen' or 'edited'. Actual removal of content is not performed by snitch, but this will
-remove the item from the default list returned by GET /items. Currently the user reporting a decision must 
+Actions are either ```kept```, ```removed```, ```seen``` or ```edited```.
+
+Actual removal of content is not performed by snitch, but this will
+remove the item from the default list returned by GET /items. Currently the user reporting a decision must
 be god of the given realm, but this is just a temporary solution until we have a proper concept of "moderators".
 Both the decision and the decider is registered with the item in question.
 
-Optionally you can provide a "rationale" label to explain the reason for the action. Defined rationales at this time 
+Optionally you can provide a "rationale" label to explain the reason for the action. Defined rationales at this time
 is (provided here with the norwegian translations used in Origo):
 
     'practical' -> Praktiske årsaker
