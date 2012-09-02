@@ -1,0 +1,23 @@
+---
+common: &common
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  pool: 5
+  username: snitch
+
+production:
+  database: snitch_production
+  password: 
+  <<: *common
+
+development:
+  database: snitch_development
+  password: 
+  <<: *common
+
+test:
+  database: snitch_test
+  password: 
+  min_messages: WARNING
+  <<: *common

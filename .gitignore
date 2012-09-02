@@ -8,3 +8,4 @@ coverage/
 .idea
 selftest
 config/site.rb
+config/database.yml
