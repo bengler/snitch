@@ -74,7 +74,7 @@ GEM
       pathbuilder
       queryparams
       yajl-ruby
-    petroglyph (0.0.1)
+    petroglyph (0.0.3)
       tilt
     pg (0.12.2)
     queryparams (0.0.3)
