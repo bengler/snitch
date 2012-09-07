@@ -7,10 +7,12 @@ describe 'API v1' do
     SnitchV1
   end
 
+  let(:alice) { DeepStruct.wrap(:identity => {:id => 1337, :god => true, :realm => 'rock_and_roll'}) }
+
+  before :each do
+    Pebblebed::Connector.any_instance.stub(:checkpoint).and_return(stub(:get => alice))
+  end
   context "with a logged in god" do
-    before :each do
-      Pebblebed::Connector.any_instance.stub(:checkpoint).and_return(DeepStruct.wrap(:me => {:id => 1337, :god => true, :realm => 'rock_and_roll'}))
-    end
 
     it "lets me report a decision on an unreported item" do 
       uid = "thing:thang$thong"
@@ -96,9 +98,7 @@ describe 'API v1' do
   end
 
   context "with a logged in user" do
-    before :each do
-      Pebblebed::Connector.any_instance.stub(:checkpoint).and_return(DeepStruct.wrap(:me => {:id => 1337, :god => false, :realm => 'rock_and_roll'}))
-    end
+    let(:alice) { DeepStruct.wrap(:identity => {:id => 1337, :god => false, :realm => 'rock_and_roll'}) }
 
     it "accepts a report of objectionable content" do
       uid = 'post:realm$1'
@@ -145,9 +145,7 @@ describe 'API v1' do
   end
 
   describe "with no current user" do
-    before :each do
-      Pebblebed::Connector.any_instance.stub(:checkpoint).and_return(DeepStruct.wrap(:me => {}))
-    end
+    let(:alice) { DeepStruct.wrap(:identity => {}) }
 
     it "accepts anonymous reports" do
       uid = 'post:realm$1'
