@@ -145,7 +145,7 @@ describe 'API v1' do
   end
 
   describe "with no current user" do
-    let(:alice) { DeepStruct.wrap(:identity => {}) }
+    let(:alice) { DeepStruct.wrap({}) }
 
     it "accepts anonymous reports" do
       uid = 'post:realm$1'

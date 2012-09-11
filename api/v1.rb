@@ -28,14 +28,13 @@ class SnitchV1 < Sinatra::Base
   end  
 
   post '/reports/:uid' do |uid|
-    existing_report = begin
-      # Only look for existing reports for logged in users
-      if current_identity[:id]
-        item = Item.find_by_uid(uid)    
-        Report.find_by_item_id_and_reporter(item.id, current_identity.id) if item
-      end
+    # Only look for existing reports for logged in users
+    reporter = current_identity && current_identity[:id]
+    existing_report = if reporter
+      item = Item.find_by_uid(uid)
+      Report.find_by_item_id_and_reporter(item.id, reporter) if item
     end
-    Report.create!(:uid => uid, :reporter => current_identity[:id]) unless existing_report
+    Report.create!(:uid => uid, :reporter => reporter) unless existing_report
     [200, "Ok"]
   end
 
