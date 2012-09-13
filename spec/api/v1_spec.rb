@@ -67,6 +67,17 @@ describe 'API v1' do
       JSON.parse(last_response.body)['items'].size.should eq 1
     end
 
+    it "supports querying items by uids (multiple) with a null placeholder for missing items" do
+      post "/reports/klass1:apdm.calendar$1"
+      post "/reports/klass2:apdm.calendar$2"
+      post "/reports/klass2:apdm.blogs$3"
+
+      get "/items/klass1:apdm.calendar$1,klass2:apdm.calendar$2,klass2:apdm.blogs$3,klass2:apdm.blogs$4"
+      JSON.parse(last_response.body)['items'].size.should eq 4
+      JSON.parse(last_response.body)['items'].last['uid'].should be_nil
+      JSON.parse(last_response.body)['items'].select {|i| i['item']['uid'] == nil}.size.should == 1
+    end
+
     it "only accepts valid actions" do
       post "/items/item:of$somesort/actions", :action => {:kind => 'kept'}
       last_response.status.should eq 200

@@ -40,24 +40,34 @@ class SnitchV1 < Sinatra::Base
 
   get '/items/?:uid?' do
     require_god # TODO: Rather check that the user is a moderator
-    klass = '*'
-    oid = nil
-    path = params[:path]
-    klass, path, oid = Pebblebed::Uid.raw_parse(params[:uid]) if params[:uid]
-    require_parameters(params, :path) unless path
-    items = Item.by_path(path).order("created_at desc")
-    items = items.where(:klass => klass) unless klass == '*'
-    params[:scope] ||= 'pending'
-    if params[:scope] == 'fresh'
-      items = items.fresh
-    elsif params[:scope] == 'reported'
-      items = items.reported
-    elsif params[:scope] == 'processed'
-      items = items.processed
-    elsif params[:scope] == 'pending'
-      items = items.unprocessed.reported
+    if params[:uid] =~ /\,/
+      # Retrieve a list of items with null-placeholders for missing items to
+      # guaranatee exact same output order as input order
+      uids = params[:uid].split(/\s*,\s*/).compact
+      items = []
+      uids.each { |uid| items << (item = Item.find_by_uid(uid.strip); item ? item : {})}
+      items, pagination = items, {:limit => items.count, :offset => 0, :last_page => true}
+      return pg :items, :locals => {:items => items, :pagination => pagination}
     else
-      halt 400, "Unknown scope #{params[:scope]}"
+      klass = '*'
+      oid = nil
+      path = params[:path]
+      klass, path, oid = Pebblebed::Uid.raw_parse(params[:uid]) if params[:uid]
+      require_parameters(params, :path) unless path
+      items = Item.by_path(path).order("created_at desc")
+      items = items.where(:klass => klass) unless klass == '*'
+      params[:scope] ||= 'pending'
+      if params[:scope] == 'fresh'
+        items = items.fresh
+      elsif params[:scope] == 'reported'
+        items = items.reported
+      elsif params[:scope] == 'processed'
+        items = items.processed
+      elsif params[:scope] == 'pending'
+        items = items.unprocessed.reported
+      else
+        halt 400, "Unknown scope #{params[:scope]}"
+      end
     end
     items, pagination = limit_offset_collection(items, params)
     pg :items, :locals => {:items => items, :pagination => pagination}
