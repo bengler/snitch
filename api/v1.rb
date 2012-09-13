@@ -45,8 +45,8 @@ class SnitchV1 < Sinatra::Base
       # guaranatee exact same output order as input order
       uids = params[:uid].split(/\s*,\s*/).compact
       items = []
-      uids.each { |uid| items << (item = Item.find_by_uid(uid.strip); item ? item : {})}
-      items, pagination = items, {:limit => items.count, :offset => 0, :last_page => true}
+      uids.each { |uid| items << (item = Item.find_by_uid(uid); item ? item : {})}
+      pagination = {:limit => items.count, :offset => 0, :last_page => true}
       return pg :items, :locals => {:items => items, :pagination => pagination}
     else
       klass = '*'
