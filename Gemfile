@@ -13,7 +13,7 @@ gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
 gem 'pebble_path'
 gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git"
-gem 'airbrake', :require => false
+gem 'airbrake', '~> 3.1.4', :require => false
 
 group :development, :test do
   gem 'rspec', '~> 2.8'
