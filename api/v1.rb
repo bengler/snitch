@@ -52,9 +52,11 @@ class SnitchV1 < Sinatra::Base
       klass = '*'
       oid = nil
       path = params[:path]
+      order = order_from_params
+      sort_by = sort_by_from_params
       klass, path, oid = Pebblebed::Uid.raw_parse(params[:uid]) if params[:uid]
       require_parameters(params, :path) unless path
-      items = Item.by_path(path).order("created_at desc")
+      items = Item.by_path(path).order("#{sort_by} #{order}")
       items = items.where(:klass => klass) unless klass == '*'
       params[:scope] ||= 'pending'
       if params[:scope] == 'fresh'
@@ -121,4 +123,30 @@ class SnitchV1 < Sinatra::Base
   #   item.save!
   #   pg :item, :locals => {:item => item}
   # end
+
+  private
+
+    def order_from_params
+      case params[:order]
+        when "asc", "ASC"
+          "asc"
+        when "desc", "DESC"
+          "desc"
+        else
+          "desc"
+      end
+    end
+
+    def sort_by_from_params
+      case params[:sort_by]
+        when "created_by"
+          "created_by"
+        when "action_at"
+          "action_at"
+        when "updated_at"
+          "updated_at"
+        else
+          "created_at"
+      end
+    end
 end

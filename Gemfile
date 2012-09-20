@@ -23,5 +23,5 @@ group :development, :test do
   gem 'capistrano-bengler', :git => "git@github.com:bengler/capistrano-bengler.git", :require => false
   # gem 'vcr'
   # gem 'webmock'
-  # gem 'timecop'
+  gem 'timecop'
 end
