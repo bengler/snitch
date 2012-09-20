@@ -1,4 +1,5 @@
 require 'simplecov'
+require 'timecop'
 
 SimpleCov.add_filter 'spec'
 SimpleCov.add_filter 'config'
@@ -24,6 +25,9 @@ set :environment, :test
 
 # Run all examples in a transaction
 RSpec.configure do |c|
+  c.after(:each) do
+    Timecop.return
+  end
   c.around(:each) do |example|
     clear_cookies if respond_to?(:clear_cookies)
 #    $memcached = Mockcached.new

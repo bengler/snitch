@@ -42,6 +42,12 @@ Optionally you can provide a :scope for the request:
     'reported': All reported items, including items that have recieved a decision
     'fresh': Any fresh content that has not been marked as seen by a moderator
 
+You may sort the results by using :sort_by and :order:
+
+    'sort_by': May be 'created_at', 'updated_at' or 'action_at' (default 'created_at')
+    'order': May be 'asc' or 'desc' (default 'desc')
+
+
 ### GET /items/uid,uid,uid...
 You may also input a list of full UIDs:
 
