@@ -31,7 +31,7 @@ describe 'API v1' do
       end
 
       post "/reports/thing:thang.thong$13666"
-      
+
       get "/items", :path => "thang"
       result = JSON.parse(last_response.body)
       oids = result['items'].map do |record|
@@ -47,6 +47,90 @@ describe 'API v1' do
         record['item']['uid'][/\$\d*$/][1..-1]
       end
       oids.should eq ["9", "8", "7", "6", "4", "3", "2", "1", "0"] # < with '5' removed
+    end
+
+    it "supports sorting on created_at in both orders" do
+      Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
+      3.times do |i|
+        Timecop.travel(i.days.ago) do
+          post "/reports/thing:thang$#{i}"
+        end
+      end
+
+      get "/items", :path => "thang", :sort_by => "created_at", :order => "desc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['created_at']
+      end
+      dates.should == ["2012-09-20T09:52:09+02:00", "2012-09-19T09:52:09+02:00", "2012-09-18T09:52:09+02:00"]
+
+      get "/items", :path => "thang", :sort_by => "created_at", :order => "asc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['created_at']
+      end
+      dates.should == ["2012-09-18T09:52:09+02:00", "2012-09-19T09:52:09+02:00", "2012-09-20T09:52:09+02:00"]
+    end
+
+    it "supports sorting on updated_at in both orders" do
+      Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
+      3.times do |i|
+        Timecop.travel(i.days.ago) do
+          post "/reports/thing:thang$#{i}"
+        end
+      end
+      # Update first post
+      Timecop.travel(Time.parse("2012-10-20T09:52:09+02:00")) do
+        i = Item.first
+        i.report_count = 2
+        i.save!
+      end
+      get "/items", :path => "thang", :sort_by => "updated_at", :order => "desc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['updated_at']
+      end
+      dates.should == ["2012-10-20T09:52:09+02:00", "2012-09-19T09:52:09+02:00", "2012-09-18T09:52:09+02:00"]
+
+      get "/items", :path => "thang", :sort_by => "updated_at", :order => "asc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['updated_at']
+      end
+      dates.should == ["2012-09-18T09:52:09+02:00", "2012-09-19T09:52:09+02:00", "2012-10-20T09:52:09+02:00"]
+    end
+
+    it "supports sorting on action_at in both orders" do
+      Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
+      3.times do |i|
+        Timecop.travel(i.days.ago) do
+          post "/reports/thing:thang$#{i}"
+        end
+      end
+      # Register an action
+      Timecop.travel(Time.parse("2012-10-22T09:52:09+02:00")) do
+        post "/items/thing:thang$1/actions", :action => {:kind => 'seen'}
+      end
+      Timecop.travel(Time.parse("2012-11-15T09:52:09+02:00")) do
+        post "/items/thing:thang$2/actions", :action => {:kind => 'seen'}
+      end
+      Timecop.travel(Time.parse("2012-12-01T09:52:09+02:00")) do
+        post "/items/thing:thang$0/actions", :action => {:kind => 'seen'}
+      end
+
+      get "/items", :path => "thang", :sort_by => "action_at", :order => "desc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['action_at']
+      end
+      dates.should == ["2012-12-01T08:52:09+01:00", "2012-11-15T08:52:09+01:00", "2012-10-22T09:52:09+02:00"]
+
+      get "/items", :path => "thang", :sort_by => "action_at", :order => "asc"
+      result = JSON.parse(last_response.body)
+      dates = result['items'].map do |record|
+        record['item']['action_at']
+      end
+      dates.should == ["2012-10-22T09:52:09+02:00", "2012-11-15T08:52:09+01:00", "2012-12-01T08:52:09+01:00"]
     end
 
     it "supports querying items by uid" do
