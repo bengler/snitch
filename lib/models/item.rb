@@ -1,5 +1,5 @@
 class Item < ActiveRecord::Base
-  include PebblePath
+  include Pebbles::Path
 
   has_many :reports
   has_many :actions, :order => "created_at desc"

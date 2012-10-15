@@ -11,7 +11,7 @@ gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
 gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
-gem 'pebble_path'
+gem 'pebbles-path'
 gem 'pebbles-uid'
 gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git"
 gem 'airbrake', '~> 3.1.4', :require => false
