@@ -34,7 +34,7 @@ class SnitchV1 < Sinatra::Base
     if query.list?
       # Retrieve a list of items with null-placeholders for missing items to
       # guaranatee exact same output order as input order
-      uids = query.terms
+      uids = query.list
       items = []
       uids.each { |uid| items << (item = Item.find_by_uid(uid); item ? item : {})}
       pagination = {:limit => items.count, :offset => 0, :last_page => true}
