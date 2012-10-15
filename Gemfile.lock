@@ -82,6 +82,7 @@ GEM
       pathbuilder
       queryparams
       yajl-ruby
+    pebbles-uid (0.0.3)
     petroglyph (0.0.3)
       tilt
     pg (0.12.2)
@@ -138,6 +139,7 @@ DEPENDENCIES
   capistrano-bengler!
   pebble_path
   pebblebed
+  pebbles-uid
   petroglyph
   pg
   rack-contrib!
