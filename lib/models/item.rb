@@ -16,7 +16,7 @@ class Item < ActiveRecord::Base
   scope :fresh, where("not seen")
   scope :reported, where("report_count > 0")
 
-  scope :by_wildcard_uid, lambda { |uid| 
+  scope :by_wildcard_uid, lambda { |uid|
     klass, path, oid = Pebblebed::Uid.raw_parse(uid)
     scope = by_path(path)
     scope = where(:klass => klass) unless klass == '*'
@@ -31,13 +31,13 @@ class Item < ActiveRecord::Base
   def self.find_or_create_by_uid(uid)
     item = self.find_by_uid(uid)
     unless item
-      item = Item.new(:uid => uid) 
+      item = Item.new(:uid => uid)
       item.save!
     end
     item
   end
 
-  def realm 
+  def realm
     label_0
   end
 
