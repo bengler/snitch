@@ -186,7 +186,7 @@ describe 'API v1' do
       JSON.parse(last_response.body)['actions'].size.should == 3
       get "/items/item:number.*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 3
-      get "/items/item:*$one/actions"
+      get "/items/item:number.*$one/actions"
       JSON.parse(last_response.body)['actions'].size.should == 2
     end
 

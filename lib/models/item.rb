@@ -17,10 +17,10 @@ class Item < ActiveRecord::Base
   scope :reported, where("report_count > 0")
 
   scope :by_wildcard_uid, lambda { |uid|
-    klass, path, oid = Pebblebed::Uid.raw_parse(uid)
-    scope = by_path(path)
-    scope = where(:klass => klass) unless klass == '*'
-    scope = where(:oid => oid) if oid && oid != '*'
+    query =  Pebbles::Uid.query(uid)
+    scope = by_path(query.path)
+    scope = where(:klass => query.genus) if query.genus?
+    scope = where(:oid => query.oid) if query.oid?
     scope
   }
 
@@ -46,7 +46,8 @@ class Item < ActiveRecord::Base
   end
 
   def uid=(uid)
-    self.klass, self.path, self.oid = Pebblebed::Uid.parse(uid)
+    parsed = Pebbles::Uid.new(uid)
+    self.klass, self.path, self.oid = parsed.genus, parsed.path, parsed.oid
   end
 
   private
