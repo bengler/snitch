@@ -20,8 +20,7 @@ class UsePebblePath < ActiveRecord::Migration
       say " ... processed #{counter} items" if (counter % 100) == 0
 
       id = item["id"]
-      parsed = Pebbles::Uid.new(item['uid'])
-      klass, path, oid = parsed.genus, parsed.path, parsed.oid
+      klass, path, oid = Pebbles::Uid.parse(item['uid'])
 
       labels = path.split('.')
       new_values = []

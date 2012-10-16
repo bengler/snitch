@@ -19,7 +19,7 @@ class Item < ActiveRecord::Base
   scope :by_wildcard_uid, lambda { |uid|
     query =  Pebbles::Uid.query(uid)
     scope = by_path(query.path)
-    scope = where(:klass => query.genus) if query.genus?
+    scope = where(:klass => query.species) if query.species?
     scope = where(:oid => query.oid) if query.oid?
     scope
   }
@@ -42,12 +42,12 @@ class Item < ActiveRecord::Base
   end
 
   def uid
-    "#{klass}:#{path}$#{oid}"
+    Pebbles::Uid.build(klass, path, oid)
   end
 
   def uid=(uid)
     parsed = Pebbles::Uid.new(uid)
-    self.klass, self.path, self.oid = parsed.genus, parsed.path, parsed.oid
+    self.klass, self.path, self.oid = parsed.species, parsed.path, parsed.oid
   end
 
   private

@@ -43,7 +43,7 @@ class SnitchV1 < Sinatra::Base
       params[:scope] ||= 'pending'
       items = Item.by_path(query.path).order(
         "#{sort_by_from_params} #{order_from_params}")
-      items = items.where(:klass => query.genus) if query.genus?
+      items = items.where(:klass => query.species) if query.species?
       items = case params[:scope]
         when 'fresh'
           items.fresh
