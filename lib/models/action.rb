@@ -3,10 +3,7 @@ class Action < ActiveRecord::Base
   
   KINDS = ['removed', 'kept', 'edited', 'seen']
 
-  RATIONALES = ['practical', 'relevance', 'adhominem', 'hatespeech', 'doublepost', 'legal', 'advertising', 'policy']
-
   validates_inclusion_of :kind, :in => KINDS
-  validates_inclusion_of :rationale, :in => RATIONALES, :allow_nil => true
 
   after_save :apply_decision
 
