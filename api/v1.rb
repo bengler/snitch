@@ -128,7 +128,7 @@ class SnitchV1 < Sinatra::Base
   # @path /api/snitch/v1/items/:uid/actions
   #
   # @required [JSON] action
-  # @required [String] action[kind] One of "kept", "removed", "seen" or "edited".
+  # @required [String] action[kind] One of "kept", "removed", "seen", "edited", "recommended" or "recommendation_revoked".
   # @optional [String] action[rationale] Optionally you can provide a "rationale" label to explain the reason for the
   #   action. Example rationales could be "irrelevant", "adhominem", "hatespeech", "legal", etc.
   # @optional [String] action[message] An additional human readable explanation of the action. This should be directed
