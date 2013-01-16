@@ -13,6 +13,8 @@ gem 'pebblebed'
 gem 'unicorn', '~> 4.1.1'
 gem 'pebbles-path'
 gem 'pebbles-uid'
+gem 'pebbles-cors', :git => 'git://github.com/bengler/pebbles-cors.git'
+
 gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git"
 gem 'airbrake', '~> 3.1.4', :require => false
 
