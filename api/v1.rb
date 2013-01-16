@@ -39,7 +39,6 @@ class SnitchV1 < Sinatra::Base
   # @apidoc
   # Return a paginated list of unprocessed reported resources (i.e. for a moderator to review).
   #
-  # @note Currently requires god permission
   #
   # @category Snitch
   # @path /api/snitch/v1/items/:uid
@@ -156,7 +155,6 @@ class SnitchV1 < Sinatra::Base
   # @description Returns a paginated list of recent actions on items matching the wildcard uid sorted by date. By default
   # this will only go as far back as 30 days for performance reasons. By passing a date to the parameter :since you may
   # page even further back.
-  # @note Requires god
   # @path /api/snitch/v1/items/:uid/actions
   # @http GET
   # @category Snitch
