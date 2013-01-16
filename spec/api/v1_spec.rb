@@ -227,11 +227,6 @@ describe 'API v1' do
       Item.find_by_uid("dings:blah$2").report_count.should eq 1
     end
 
-    it "won't give me any items 'cause I'm nobody" do
-      get "/items?path=dingo"
-      last_response.status.should eq 403
-    end
-
     it "won't let me report a decision 'cause I'm nobody" do
       post "/items/thing:thang$thong/actions", :action => {:kind => 'kept'}
       last_response.status.should eq 403
@@ -251,11 +246,6 @@ describe 'API v1' do
       report.reporter.should be_nil
       report.item.uid.should eq uid
       report.item.report_count.should eq 3
-    end
-
-    it "won't give me any items 'cause I'm nobody" do
-      get "/items?path=dingo"
-      last_response.status.should eq 403
     end
 
     it "won't let me report a decision 'cause I'm nobody" do
