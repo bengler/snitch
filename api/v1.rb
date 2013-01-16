@@ -62,7 +62,6 @@ class SnitchV1 < Sinatra::Base
   #   pagination will not be possible as it always returns the exact items and in the exact order as the input uid list.
   #   If an item is not found, it will output a null item in the same position as the input.
   get '/items/?:uid?' do
-    require_god # TODO: Rather check that the user is a moderator
     query = Pebbles::Uid.query(params[:uid]) if params[:uid]
     query ||= Pebbles::Uid.query("*:#{params[:path]}") if params[:path]
     query ||= Pebbles::Uid.query("*:#{current_identity.realm}.*")
@@ -163,8 +162,6 @@ class SnitchV1 < Sinatra::Base
   # @category Snitch
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$*/actions
   get '/items/:uid/actions' do |uid|
-    require_god
-
     if params[:since]
       since = Time.parse(params[:since])
     else
