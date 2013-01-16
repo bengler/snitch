@@ -5,6 +5,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'sinatra-activerecord', :require => false
 gem 'rack-contrib', :git => 'git://github.com/rack/rack-contrib.git'
+gem 'rack-protection', :git => 'git://github.com/rkh/rack-protection.git'
 gem 'activerecord', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
