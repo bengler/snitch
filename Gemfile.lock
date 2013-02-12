@@ -79,7 +79,7 @@ GEM
       net-ssh (>= 1.99.1)
     nokogiri (1.5.6)
     pathbuilder (0.0.2)
-    pebblebed (0.0.43)
+    pebblebed (0.0.44)
       activesupport
       bunny
       curb (>= 0.7.14)
@@ -147,7 +147,7 @@ DEPENDENCIES
   bengler_test_helper!
   capistrano (~> 2.9.0)
   capistrano-bengler!
-  pebblebed (~> 0.0.43)
+  pebblebed (~> 0.0.44)
   pebbles-cors!
   pebbles-path
   pebbles-uid

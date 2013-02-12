@@ -19,12 +19,12 @@ describe 'API v1' do
     DeepStruct.wrap(:identity => {:realm => 'testrealm', :id => 1, :god => false})
   }
   let(:access) {
-    DeepStruct.wrap(:access => {:granted => true})
+    DeepStruct.wrap(:allowed => true)
   }
   let(:access_denied) {
-    DeepStruct.wrap(:access => {:granted => false})
+    DeepStruct.wrap(:allowed => false)
   }
-  context "with a logged in user that has access group membership" do
+  context "with a logged in user that is allowed through checkpoint psm2 callback" do
 
     before(:each) do
       user!
@@ -33,7 +33,7 @@ describe 'API v1' do
     end
 
     it "lets me report a decision on an unreported item" do
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm").and_return(access)
+      checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/thing:testrealm$thong").and_return(access)
       uid = "thing:testrealm$thong"
       post "/items/#{uid}/actions", :action => {:kind => 'kept'}
       item = Item.first
@@ -45,7 +45,7 @@ describe 'API v1' do
     end
 
     it "gives me a list of unprocessed items" do
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm").and_return(access)
+      checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/thing:testrealm$5").and_return(access)
       10.times do |i|
         post "/reports/thing:testrealm$#{i}"
       end
@@ -121,7 +121,9 @@ describe 'API v1' do
     end
 
     it "supports sorting on action_at in both orders" do
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/thing:testrealm$0").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/thing:testrealm$1").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/thing:testrealm$2").and_return(access)
       Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
@@ -185,7 +187,9 @@ describe 'API v1' do
     end
 
     it "only accepts valid actions" do
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/item:testrealm$somesort").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/item:testrealm$othersort").and_return(access)
+      checkpoint.should_receive(:get).with("/callbacks/allowed/create/item:testrealm$thirdkind").and_return(access)
       post "/items/item:testrealm$somesort/actions", :action => {:kind => 'kept'}
       last_response.status.should eq 200
       post "/items/item:testrealm$othersort/actions", :action => {:kind => 'removed'}
@@ -196,14 +200,15 @@ describe 'API v1' do
     end
 
     it "denies access accross realms" do
-      checkpoint.should_not_receive(:get).at_least(1).times.with("/identities/1/access_to/foo").and_return(access_denied)
+      checkpoint.should_not_receive(:get).at_least(1).times.with("/callbacks/allowed/create/item:foo$somesort").and_return(access_denied)
       post "/items/item:foo$somesort/actions", :action => {:kind => 'kept'}
       last_response.status.should eq 403
     end
 
     it "provides a lists of recent actions" do
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm").and_return(access)
-      checkpoint.should_receive(:get).at_least(1).times.with("/identities/1/access_to/testrealm.subitem").and_return(access)
+      checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/item:testrealm$one").and_return(access)
+      checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/otherklass:testrealm$two").and_return(access)
+      checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/item:testrealm.subitem$three").and_return(access)
       post "/items/item:testrealm$one/actions", :action => {:kind => 'edited'}
       post "/items/item:testrealm$one/actions", :action => {:kind => 'edited'}
       post "/items/item:testrealm.subitem$three/actions", :action => {:kind => 'edited'}

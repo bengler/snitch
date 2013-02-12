@@ -135,7 +135,7 @@ class SnitchV1 < Sinatra::Base
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923/actions?action[kind]=kept
   #
   post '/items/:uid/actions' do |uid|
-    require_access_to_path(Pebbles::Uid.new(uid).path)
+    require_action_allowed(:create, uid)
 
     halt 400, "No action given with request" unless params[:action]
     halt 400, "Decision must be one of #{Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])
