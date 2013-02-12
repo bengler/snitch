@@ -10,7 +10,7 @@ gem 'activerecord', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
-gem 'pebblebed'
+gem 'pebblebed', '~> 0.0.43'
 gem 'unicorn', '~> 4.1.1'
 gem 'pebbles-path'
 gem 'pebbles-uid'
