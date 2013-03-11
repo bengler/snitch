@@ -14,9 +14,9 @@ gem 'pebblebed', '~> 0.0.44'
 gem 'pebbles-path'
 gem 'pebbles-uid'
 gem 'pebbles-cors', :git => 'git://github.com/bengler/pebbles-cors.git'
-gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git", :require => false
 
 group :development, :test do
+  gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git", :require => false
   gem 'rspec', '~> 2.8'
   gem 'rack-test'
   gem 'simplecov'
