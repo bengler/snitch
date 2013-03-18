@@ -10,21 +10,19 @@ $:.unshift(File.dirname(File.dirname(__FILE__)))
 ENV["RACK_ENV"] = "test"
 require 'config/environment'
 
-# require './spec/mockcached'
 require 'rack/test'
 
 require 'api/v1'
-
-# require 'vcr'
-# VCR.config do |c|
-#   c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
-#   c.stub_with :webmock
-# end
 
 set :environment, :test
 
 # Run all examples in a transaction
 RSpec.configure do |c|
+  c.before(:each) do
+    Time.zone = "Europe/Oslo"
+    ActiveRecord::Base.time_zone_aware_attributes = true
+    ActiveRecord::Base.default_timezone = "Europe/Oslo"
+  end
   c.after(:each) do
     Timecop.return
   end
