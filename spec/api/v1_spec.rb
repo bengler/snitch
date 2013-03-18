@@ -70,7 +70,7 @@ describe 'API v1' do
     end
 
     it "supports sorting on created_at in both orders" do
-      Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
+      Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
           post "/reports/thing:testrealm$#{i}"
@@ -82,25 +82,25 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['created_at']
       end
-      dates.should == ["2012-09-20T11:52:09+02:00", "2012-09-19T11:52:09+02:00", "2012-09-18T11:52:09+02:00"]
+      dates.should == ["2012-05-20T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-18T11:52:09+02:00"]
 
       get "/items", :path => "testrealm", :sort_by => "created_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['created_at']
       end
-      dates.should == ["2012-09-18T11:52:09+02:00", "2012-09-19T11:52:09+02:00", "2012-09-20T11:52:09+02:00"]
+      dates.should == ["2012-05-18T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
     end
 
     it "supports sorting on updated_at in both orders" do
-      Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
+      Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
           post "/reports/thing:testrealm$#{i}"
         end
       end
       # Update first post
-      Timecop.travel(Time.parse("2012-10-20T09:52:09+02:00")) do
+      Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00")) do
         i = Item.first
         i.report_count = 2
         i.save!
@@ -110,14 +110,14 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['updated_at']
       end
-      dates.should == ["2012-10-20T11:52:09+02:00", "2012-09-19T11:52:09+02:00", "2012-09-18T11:52:09+02:00"]
+      dates.should == ["2012-05-20T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-18T11:52:09+02:00"]
 
       get "/items", :path => "testrealm", :sort_by => "updated_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['updated_at']
       end
-      dates.should == ["2012-09-18T11:52:09+02:00", "2012-09-19T11:52:09+02:00", "2012-10-20T11:52:09+02:00"]
+      dates.should == ["2012-05-18T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
     end
 
     it "supports sorting on action_at in both orders" do
@@ -131,13 +131,13 @@ describe 'API v1' do
         end
       end
       # Register an action
-      Timecop.travel(Time.parse("2012-10-22T09:52:09+02:00")) do
+      Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00")) do
         post "/items/thing:testrealm$1/actions", :action => {:kind => 'seen'}
       end
-      Timecop.travel(Time.parse("2012-11-15T09:52:09+02:00")) do
+      Timecop.travel(Time.parse("2012-07-20T09:52:09+02:00")) do
         post "/items/thing:testrealm$2/actions", :action => {:kind => 'seen'}
       end
-      Timecop.travel(Time.parse("2012-12-01T09:52:09+02:00")) do
+      Timecop.travel(Time.parse("2012-08-20T09:52:09+02:00")) do
         post "/items/thing:testrealm$0/actions", :action => {:kind => 'seen'}
       end
 
@@ -146,14 +146,14 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['action_at']
       end
-      dates.should == ["2012-12-01T09:52:09+01:00", "2012-11-15T09:52:09+01:00", "2012-10-22T11:52:09+02:00"]
+      dates.should == ["2012-08-20T11:52:09+02:00", "2012-07-20T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
 
       get "/items", :path => "testrealm", :sort_by => "action_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['action_at']
       end
-      dates.should == ["2012-10-22T11:52:09+02:00", "2012-11-15T09:52:09+01:00", "2012-12-01T09:52:09+01:00"]
+      dates.should == ["2012-05-20T11:52:09+02:00", "2012-07-20T11:52:09+02:00", "2012-08-20T11:52:09+02:00"]
     end
 
     it "supports querying items by uid" do
