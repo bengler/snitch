@@ -120,7 +120,9 @@ CREATE TABLE reports (
     item_id integer,
     reporter integer,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    kind character varying(255),
+    comment text
 );
 
 
