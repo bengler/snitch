@@ -1,6 +1,8 @@
 class Report < ActiveRecord::Base
   belongs_to :item, :counter_cache => :report_count
 
+  validates :reporter, :uniqueness => {:scope => [:item_id, :kind]}
+
   before_create :ensure_item
 
   def uid=(value)
