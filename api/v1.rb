@@ -32,9 +32,9 @@ class SnitchV1 < Sinatra::Base
     reporter = current_identity && current_identity[:id]
     kind = params[:kind]
     comment = params[:comment]
-    existing_report = if reporter
+    existing_report = if reporter && kind.nil?
       item = Item.find_by_uid(uid)
-      Report.find_by_item_id_and_reporter_and_kind(item.id, reporter, kind) if item
+      Report.find_by_item_id_and_reporter_and_kind(item.id, reporter, nil) if item
     end
     if !existing_report
       Report.create!(:uid => uid, :reporter => reporter, :kind => kind, :comment => comment)
@@ -179,6 +179,23 @@ class SnitchV1 < Sinatra::Base
     actions, pagination = limit_offset_collection(actions, params)
     pg :actions, :locals => {:actions => actions, :pagination => pagination}
   end
+
+  # @apidoc
+  # Get a list of submitted reports for the given item
+  #
+  # @description Returns a paginated list of submitted reports for the given item
+  # @path /api/snitch/v1/items/:uid/reports
+  # @http GET
+  # @category Snitch
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$42/reports
+  get '/items/:uid/reports' do |uid|
+    require_identity
+    item = Item.find_by_uid(uid)
+    reports = (item ? item.reports : Report.where('false'))
+    reports, pagination = limit_offset_collection(reports, params)
+    pg :reports, :locals => {:reports => reports, :pagination => pagination}
+  end
+
 
   helpers do
 
