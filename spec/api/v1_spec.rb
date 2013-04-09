@@ -239,13 +239,29 @@ describe 'API v1' do
       report = Report.first
       report.uid.should eq uid
       report.reporter.should eq 1
+      report.kind.should be_nil
+      report.comment.should be_nil
       item = Item.first
       item.realm.should eq "realm"
       item.uid.should eq uid
       item.report_count.should eq 1
     end
 
-    it "quietly rejects multiple reports from same user of same content" do
+    it "accepts a report of objectionable content with kind and comment" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'bollox', :comment => 'Hogwash!'
+      report = Report.first
+      report.uid.should eq uid
+      report.reporter.should eq 1
+      report.kind.should eq 'bollox'
+      report.comment.should eq 'Hogwash!'
+      item = Item.first
+      item.realm.should eq "realm"
+      item.uid.should eq uid
+      item.report_count.should eq 1
+    end
+
+    it "quietly rejects multiple kindless reports from same user of same content" do
       uid = 'post:realm$1'
       post "/reports/#{uid}"
       post "/reports/#{uid}"
@@ -253,6 +269,26 @@ describe 'API v1' do
       Item.count.should eq 1
       item = Item.first
       item.report_count.should eq 1
+    end
+
+    it "quietly rejects multiple reports of same kind from same user of same content" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      post "/reports/#{uid}", :kind => 'foo'
+      last_response.status.should eq 200
+      Item.count.should eq 1
+      item = Item.first
+      item.report_count.should eq 1
+    end
+
+    it "accepts multiple reports of distinct kinds from same user of same content" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      post "/reports/#{uid}", :kind => 'bar'
+      last_response.status.should eq 200
+      Item.count.should eq 1
+      item = Item.first
+      item.report_count.should eq 2
     end
 
     it "counts distinct reports distinctly" do
