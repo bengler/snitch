@@ -213,7 +213,6 @@ describe 'API v1' do
       post "/items/item:testrealm$one/actions", :action => {:kind => 'edited'}
       post "/items/item:testrealm.subitem$three/actions", :action => {:kind => 'edited'}
       post "/items/otherklass:testrealm$two/actions", :action => {:kind => 'edited'}
-
       get "/items/*:*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 4
       get "/items/item:*/actions"
@@ -232,6 +231,8 @@ describe 'API v1' do
       post "/reports/#{uid}", :kind => 'offensive', :comment => 'Harsh language!'
       post "/reports/#{uid}", :kind => 'offensive', :comment => 'Simply intolerable!'
       post "/reports/#{uid}", :kind => 'falsehood', :comment => 'What a load of ...'
+      checkpoint.should_receive(:get).at_least(1).times.
+        with("/callbacks/allowed/create/#{uid}").and_return(access)
       get "/items/#{uid}/reports"
       last_response.status.should eq 200
       hash = JSON.parse(last_response.body)
@@ -250,6 +251,8 @@ describe 'API v1' do
 
     it "provides an empty list of reports for an item Snitch doesn't know about" do
       uid = "item:testrealm$fourtytwo"
+      checkpoint.should_receive(:get).at_least(1).times.
+        with("/callbacks/allowed/create/#{uid}").and_return(access)
       get "/items/#{uid}/reports"
       last_response.status.should eq 200
       hash = JSON.parse(last_response.body)

@@ -166,8 +166,6 @@ class SnitchV1 < Sinatra::Base
   # @category Snitch
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$*/actions
   get '/items/:uid/actions' do |uid|
-    require_action_allowed(:create, uid) # FIXME: Temporary until we have PSM3
-
     if params[:since]
       since = Time.parse(params[:since])
     else
