@@ -166,6 +166,8 @@ class SnitchV1 < Sinatra::Base
   # @category Snitch
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$*/actions
   get '/items/:uid/actions' do |uid|
+    require_action_allowed(:create, uid) # FIXME: Temporary until we have PSM3
+
     if params[:since]
       since = Time.parse(params[:since])
     else
@@ -188,8 +190,9 @@ class SnitchV1 < Sinatra::Base
   # @http GET
   # @category Snitch
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$42/reports
+  # @required [String] uid Pebbles uid denoting a resource
   get '/items/:uid/reports' do |uid|
-    require_identity
+    require_action_allowed(:create, uid) # FIXME: Temporary until we have PSM3
     item = Item.find_by_uid(uid)
     reports = (item ? item.reports : Report.where('false'))
     reports, pagination = limit_offset_collection(reports, params)
