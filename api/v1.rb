@@ -15,6 +15,16 @@ class SnitchV1 < Sinatra::Base
     service 'checkpoint'
   end
 
+  before do
+    # If this service, for some reason, lives behind a proxy that rewrites the Cache-Control headers into
+    # "must-revalidate" (which IE9, and possibly other IEs, does not respect), these two headers should properly prevent
+    # caching in IE (see http://support.microsoft.com/kb/234067)
+    headers 'Pragma' => 'no-cache'
+    headers 'Expires' => '-1'
+
+    cache_control :private, :no_cache, :no_store, :must_revalidate
+  end
+
   # @apidoc
   # Report a resource as objectionable.
   #
