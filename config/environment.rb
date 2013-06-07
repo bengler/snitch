@@ -10,6 +10,6 @@ ENV['RACK_ENV'] ||= "development"
 environment = ENV['RACK_ENV']
 
 ActiveRecord::Base.establish_connection($config[environment])
-
+ActiveRecord::Base.default_timezone = :utc
 Pebblebed.config do
 end
