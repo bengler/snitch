@@ -6,7 +6,7 @@ gem 'sinatra-contrib'
 gem 'sinatra-activerecord', :require => false
 gem 'rack-contrib', :git => 'git://github.com/rack/rack-contrib.git'
 gem 'rack-protection', '~> 1.3.2'
-gem 'activerecord', :require => 'active_record'
+gem 'activerecord', '~> 3.2.12', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
