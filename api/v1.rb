@@ -88,6 +88,14 @@ class SnitchV1 < Sinatra::Base
         "#{sort_by_from_params} #{order_from_params}")
       items = items.where(:klass => query.species) if query.species?
       items = case params[:scope]
+        when 'not_removed'
+          items.not_removed
+        when 'seen_and_not_removed'
+          items.seen_and_not_removed
+        when 'kept'
+          items.kept
+        when 'removed'
+          items.removed
         when 'fresh'
           items.fresh
         when 'reported'
