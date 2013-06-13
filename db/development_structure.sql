@@ -3,7 +3,7 @@
 --
 
 SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
+SET client_encoding = 'SQL_ASCII';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
@@ -39,8 +39,8 @@ CREATE TABLE actions (
     kind text,
     rationale text,
     message text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -74,8 +74,8 @@ CREATE TABLE items (
     decision text,
     decider integer,
     action_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     label_0 text,
     label_1 text,
     label_2 text,
@@ -89,7 +89,7 @@ CREATE TABLE items (
     klass text,
     oid text,
     seen boolean DEFAULT false,
-    external_uid text NOT NULL
+    external_uid text
 );
 
 
@@ -120,8 +120,10 @@ CREATE TABLE reports (
     id integer NOT NULL,
     item_id integer,
     reporter integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    kind character varying(255),
+    comment text
 );
 
 
@@ -241,10 +243,10 @@ CREATE INDEX index_items_on_realm ON items USING btree (realm);
 
 
 --
--- Name: index_reports_on_item_id_and_reporter; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_reports_on_item_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_reports_on_item_id_and_reporter ON reports USING btree (item_id, reporter);
+CREATE INDEX index_reports_on_item_id ON reports USING btree (item_id);
 
 
 --

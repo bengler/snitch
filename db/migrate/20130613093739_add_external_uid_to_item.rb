@@ -1,6 +1,6 @@
 class AddExternalUidToItem < ActiveRecord::Migration
   def self.up
-    add_column :items, :external_uid, :text, :null => false
+    add_column :items, :external_uid, :text
     Item.all.each do |item|
       item.external_uid = Pebbles::Uid.build(item.klass, item.path, item.oid)
       item.save
