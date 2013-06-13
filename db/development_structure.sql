@@ -39,8 +39,8 @@ CREATE TABLE actions (
     kind text,
     rationale text,
     message text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -74,8 +74,8 @@ CREATE TABLE items (
     decision text,
     decider integer,
     action_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     label_0 text,
     label_1 text,
     label_2 text,
@@ -88,7 +88,8 @@ CREATE TABLE items (
     label_9 text,
     klass text,
     oid text,
-    seen boolean DEFAULT false
+    seen boolean DEFAULT false,
+    external_uid text NOT NULL
 );
 
 
@@ -119,8 +120,8 @@ CREATE TABLE reports (
     id integer NOT NULL,
     item_id integer,
     reporter integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 

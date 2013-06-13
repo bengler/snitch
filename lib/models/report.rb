@@ -1,24 +1,24 @@
 class Report < ActiveRecord::Base
-  belongs_to :item  
+  belongs_to :item
 
   before_create :ensure_item
   after_create :update_report_count
 
   def uid=(value)
     if !new_record? && self.uid != value
-      raise "Can't update uid for existing record" 
+      raise "Can't update uid for existing record"
     end
     @uid = value
   end
 
   def uid
-    @uid ||= self.item.uid
+    self.item.external_uid
   end
 
   private
 
   def ensure_item
-    self.item = Item.find_or_create_by_uid(@uid)
+    self.item = Item.find_or_create_by_external_uid(@uid)
   end
 
   def update_report_count

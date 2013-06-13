@@ -4,8 +4,6 @@ class Item < ActiveRecord::Base
   has_many :reports
   has_many :actions, :order => "created_at desc"
 
-  before_save :parse_uid
-
   # Lists the valid decisions (must be a subset of Action::KINDS)
   DECISIONS = ['removed', 'kept']
 
@@ -20,22 +18,23 @@ class Item < ActiveRecord::Base
   scope :seen_and_not_removed, where("seen is true and (decision != 'removed' or decision is null)")
   scope :not_removed, where("decision != 'removed' or decision is null")
 
-  scope :by_wildcard_uid, lambda { |uid|
-    query =  Pebbles::Uid.query(uid)
+  scope :by_wildcard_external_uid, lambda { |uid|
+    query = Pebbles::Uid.query(uid)
     scope = by_path(query.path)
-    scope = where(:klass => query.species) if query.species?
+    scope = where(:klass => "snitchitem.#{query.species}") if query.species?
     scope = where(:oid => query.oid) if query.oid?
     scope
   }
 
-  def self.find_by_uid(uid)
-    self.by_wildcard_uid(uid).first
+  def self.find_by_external_uid(uid)
+    self.by_wildcard_external_uid(uid).first
   end
 
-  def self.find_or_create_by_uid(uid)
-    item = self.find_by_uid(uid)
+  def self.find_or_create_by_external_uid(uid)
+    item = self.find_by_external_uid(uid)
     unless item
-      item = Item.new(:uid => uid)
+      item = Item.new
+      item.external_uid = uid
       item.save!
     end
     item
@@ -50,14 +49,14 @@ class Item < ActiveRecord::Base
   end
 
   def uid=(uid)
-    parsed = Pebbles::Uid.new(uid)
-    self.klass, self.path, self.oid = parsed.species, parsed.path, parsed.oid
+    uid = "snitchitem.#{uid}" unless uid.start_with? 'snitchitem.'
+    self.klass, self.path, self.oid = Pebbles::Uid.parse(uid)
+    self[:external_uid] = uid.sub(/^snitchitem\./, '')
   end
 
-  private
-
-  def parse_uid
-    self.uid = attributes[:uid] if attributes[:uid]
-    attributes[:uid] = nil
+  def external_uid=(uid)
+    self[:external_uid] = uid.sub(/^snitchitem\./, '')
+    self.uid = "snitchitem.#{self[:external_uid]}"
   end
+
 end

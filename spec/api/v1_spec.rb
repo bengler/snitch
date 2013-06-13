@@ -37,7 +37,8 @@ describe 'API v1' do
       uid = "thing:testrealm$thong"
       post "/items/#{uid}/actions", :action => {:kind => 'kept'}
       item = Item.first
-      item.uid.should eq uid
+      item.uid.should eq "snitchitem.#{uid}"
+      item.external_uid.should eq uid
       item.report_count.should eq 0
       item.decision.should eq 'kept'
       item.action_at.should_not be_nil
@@ -216,10 +217,13 @@ describe 'API v1' do
 
       get "/items/*:*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 4
+
       get "/items/item:*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 3
+
       get "/items/*:testrealm/actions"
       JSON.parse(last_response.body)['actions'].size.should == 3
+
       get "/items/item:testrealm.*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 3
       get "/items/item:testrealm.*$one/actions"
@@ -237,11 +241,12 @@ describe 'API v1' do
       uid = 'post:realm$1'
       post "/reports/#{uid}"
       report = Report.first
-      report.uid.should eq uid
+      report.item.external_uid.should eq uid
       report.reporter.should eq 1
       item = Item.first
       item.realm.should eq "realm"
-      item.uid.should eq uid
+      item.uid.should eq "snitchitem.#{uid}"
+      item.external_uid.should eq uid
       item.report_count.should eq 1
     end
 
@@ -261,8 +266,8 @@ describe 'API v1' do
       Report.create!(:uid => "dings:blah$1", :reporter => 3)
       Report.create!(:uid => "dings:blah$2", :reporter => 4)
       post "/reports/dings:blah$1"
-      Item.find_by_uid("dings:blah$1").report_count.should eq 4
-      Item.find_by_uid("dings:blah$2").report_count.should eq 1
+      Item.find_by_external_uid("dings:blah$1").report_count.should eq 4
+      Item.find_by_external_uid("dings:blah$2").report_count.should eq 1
     end
 
     it "won't let me report a decision 'cause I'm nobody" do
@@ -281,7 +286,8 @@ describe 'API v1' do
       post "/reports/#{uid}"
       report = Report.first
       report.reporter.should be_nil
-      report.item.uid.should eq uid
+      report.item.external_uid.should eq uid
+      report.item.uid.should eq "snitchitem.#{uid}"
       report.item.report_count.should eq 3
     end
 
