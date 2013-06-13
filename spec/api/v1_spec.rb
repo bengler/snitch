@@ -213,7 +213,6 @@ describe 'API v1' do
       post "/items/item:testrealm$one/actions", :action => {:kind => 'edited'}
       post "/items/item:testrealm.subitem$three/actions", :action => {:kind => 'edited'}
       post "/items/otherklass:testrealm$two/actions", :action => {:kind => 'edited'}
-
       get "/items/*:*/actions"
       JSON.parse(last_response.body)['actions'].size.should == 4
       get "/items/item:*/actions"
@@ -226,6 +225,40 @@ describe 'API v1' do
       JSON.parse(last_response.body)['actions'].size.should == 2
     end
 
+    it "provides a paginated list of reports for the given item" do
+      uid = "item:testrealm$one"
+      post "/reports/#{uid}"
+      post "/reports/#{uid}", :kind => 'offensive', :comment => 'Harsh language!'
+      post "/reports/#{uid}", :kind => 'offensive', :comment => 'Simply intolerable!'
+      post "/reports/#{uid}", :kind => 'falsehood', :comment => 'What a load of ...'
+      checkpoint.should_receive(:get).at_least(1).times.
+        with("/callbacks/allowed/create/#{uid}").and_return(access)
+      get "/items/#{uid}/reports"
+      last_response.status.should eq 200
+      hash = JSON.parse(last_response.body)
+      hash.should have_key 'pagination'
+      hash.should have_key 'reports'
+      hash['reports'].size.should eq 4
+      hash['reports'].each do |report_hash|
+        report = report_hash['report']
+        report['uid'].should eq uid
+        report['reporter'].should_not be_nil
+        report['created_at'].should_not be_nil
+        report.should have_key 'kind'
+        report.should have_key 'comment'
+      end
+    end
+
+    it "provides an empty list of reports for an item Snitch doesn't know about" do
+      uid = "item:testrealm$fourtytwo"
+      checkpoint.should_receive(:get).at_least(1).times.
+        with("/callbacks/allowed/create/#{uid}").and_return(access)
+      get "/items/#{uid}/reports"
+      last_response.status.should eq 200
+      hash = JSON.parse(last_response.body)
+      hash.should have_key 'reports'
+      hash['reports'].size.should eq 0
+    end
   end
 
   context "with a logged in user" do
@@ -239,13 +272,29 @@ describe 'API v1' do
       report = Report.first
       report.uid.should eq uid
       report.reporter.should eq 1
+      report.kind.should be_nil
+      report.comment.should be_nil
       item = Item.first
       item.realm.should eq "realm"
       item.uid.should eq uid
       item.report_count.should eq 1
     end
 
-    it "quietly rejects multiple reports from same user of same content" do
+    it "accepts a report of objectionable content with kind and comment" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'bollox', :comment => 'Hogwash!'
+      report = Report.first
+      report.uid.should eq uid
+      report.reporter.should eq 1
+      report.kind.should eq 'bollox'
+      report.comment.should eq 'Hogwash!'
+      item = Item.first
+      item.realm.should eq "realm"
+      item.uid.should eq uid
+      item.report_count.should eq 1
+    end
+
+    it "quietly rejects multiple reports from same user of same content with no kind" do
       uid = 'post:realm$1'
       post "/reports/#{uid}"
       post "/reports/#{uid}"
@@ -253,6 +302,26 @@ describe 'API v1' do
       Item.count.should eq 1
       item = Item.first
       item.report_count.should eq 1
+    end
+
+    it "accepts multiple reports of same kind from same user of same content" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      post "/reports/#{uid}", :kind => 'foo'
+      last_response.status.should eq 200
+      Item.count.should eq 1
+      item = Item.first
+      item.report_count.should eq 2
+    end
+
+    it "accepts multiple reports of distinct kinds from same user of same content" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      post "/reports/#{uid}", :kind => 'bar'
+      last_response.status.should eq 200
+      Item.count.should eq 1
+      item = Item.first
+      item.report_count.should eq 2
     end
 
     it "counts distinct reports distinctly" do
