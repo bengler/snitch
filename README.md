@@ -6,7 +6,7 @@ A service to track reports of objectionable content and the corresponding modera
 
 ## Getting Started
 
-    git clone git@github.com:benglerpebbles/snitch.git snitch
+    git clone git@github.com:bengler/snitch.git
     cd snitch
 
     rake db:bootstrap
