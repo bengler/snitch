@@ -120,7 +120,9 @@ CREATE TABLE reports (
     item_id integer,
     reporter integer,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    kind character varying(255),
+    comment text
 );
 
 
@@ -240,10 +242,10 @@ CREATE INDEX index_items_on_realm ON items USING btree (realm);
 
 
 --
--- Name: index_reports_on_item_id_and_reporter; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_reports_on_item_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_reports_on_item_id_and_reporter ON reports USING btree (item_id, reporter);
+CREATE INDEX index_reports_on_item_id ON reports USING btree (item_id);
 
 
 --

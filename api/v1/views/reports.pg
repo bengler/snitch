@@ -1,0 +1,7 @@
+collection :reports => reports do |report|
+  partial :report, :report => report
+end
+
+node :pagination => pagination do
+  attributes :limit, :offset, :last_page
+end

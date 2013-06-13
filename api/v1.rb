@@ -33,16 +33,22 @@ class SnitchV1 < Sinatra::Base
   # @path /api/snitch/v1/reports/:uid
   # @http POST
   # @example /api/snitch/v1/reports/post.entry:acme.discussions.cats-vs-dogs$2342343
-  # @required [String] Pebbles uid denoting a resource
+  # @required [String] uid Pebbles uid denoting a resource
+  # @optional [String] kind Application-specific tag to denote kind of objection
+  # @optional [String] comment A comment from the reporting user
   # @status 200 OK
   post '/reports/:uid' do |uid|
     # Only look for existing reports for logged in users
     reporter = current_identity && current_identity[:id]
-    existing_report = if reporter
+    kind = params[:kind]
+    comment = params[:comment]
+    existing_report = if reporter && kind.nil?
       item = Item.find_by_uid(uid)
-      Report.find_by_item_id_and_reporter(item.id, reporter) if item
+      Report.find_by_item_id_and_reporter_and_kind(item.id, reporter, nil) if item
     end
-    Report.create!(:uid => uid, :reporter => reporter) unless existing_report
+    if !existing_report
+      Report.create!(:uid => uid, :reporter => reporter, :kind => kind, :comment => comment)
+    end
     [200, "Ok"]
   end
 
@@ -191,6 +197,24 @@ class SnitchV1 < Sinatra::Base
     actions, pagination = limit_offset_collection(actions, params)
     pg :actions, :locals => {:actions => actions, :pagination => pagination}
   end
+
+  # @apidoc
+  # Get a list of submitted reports for the given item
+  #
+  # @description Returns a paginated list of submitted reports for the given item
+  # @path /api/snitch/v1/items/:uid/reports
+  # @http GET
+  # @category Snitch
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$42/reports
+  # @required [String] uid Pebbles uid denoting a resource
+  get '/items/:uid/reports' do |uid|
+    require_action_allowed(:create, uid) # FIXME: Temporary until we have PSM3
+    item = Item.find_by_uid(uid)
+    reports = (item ? item.reports : Report.where('false'))
+    reports, pagination = limit_offset_collection(reports, params)
+    pg :reports, :locals => {:reports => reports, :pagination => pagination}
+  end
+
 
   helpers do
 
