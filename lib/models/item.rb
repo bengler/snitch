@@ -1,5 +1,6 @@
 class Item < ActiveRecord::Base
   include Pebbles::Path
+  include Petroglyphy
 
   has_many :reports
   has_many :actions, :order => "created_at desc"
@@ -21,7 +22,7 @@ class Item < ActiveRecord::Base
   scope :by_wildcard_external_uid, lambda { |uid|
     query = Pebbles::Uid.query(uid)
     scope = by_path(query.path)
-    scope = where(:klass => "snitchitem.#{query.species}") if query.species?
+    scope = where(:klass => query.species) if query.species?
     scope = where(:oid => query.oid) if query.oid?
     scope
   }
@@ -45,18 +46,20 @@ class Item < ActiveRecord::Base
   end
 
   def uid
-    Pebbles::Uid.build(klass, path, oid)
+    "snitchitem.#{external_uid}"
   end
 
-  def uid=(uid)
-    uid = "snitchitem.#{uid}" unless uid.start_with? 'snitchitem.'
-    self.klass, self.path, self.oid = Pebbles::Uid.parse(uid)
-    self[:external_uid] = uid.sub(/^snitchitem\./, '')
+  def external_uid
+    Pebbles::Uid.build(self.klass, self.path, self.oid)
   end
 
-  def external_uid=(uid)
-    self[:external_uid] = uid.sub(/^snitchitem\./, '')
-    self.uid = "snitchitem.#{self[:external_uid]}"
+  def external_uid=(value)
+    self.klass, self.path, self.oid = Pebbles::Uid.parse(value)
+  end
+
+
+  def deleted?
+    destroyed? || decision == 'removed'
   end
 
 end

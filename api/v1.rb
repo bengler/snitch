@@ -91,7 +91,7 @@ class SnitchV1 < Sinatra::Base
     else
       params[:scope] ||= 'pending'
       items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
-      items = items.where(:klass => "snitchitem.#{query.species}") if query.species?
+      items = items.where(:klass => query.species) if query.species?
       items = case params[:scope]
         when 'not_removed'
           items.not_removed

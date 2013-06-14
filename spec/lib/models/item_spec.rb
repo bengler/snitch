@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe Item do
-  it "creates by uid" do
-    Item.create!(:uid => "snitchitem.post:banan.kanon$1")
-    Item.first.external_uid.should eq "post:banan.kanon$1"
-    Item.first.uid.should eq "snitchitem.post:banan.kanon$1"
-  end
 
   it "creates by external_uid" do
     Item.create!(:external_uid => "post:banan.kanon$1")
@@ -27,20 +22,10 @@ describe Item do
     Item.first.uid.should eq "snitchitem.post:banan.kanon$1"
   end
 
-  context "changeing uids" do
-
-    it "fixes the uid when external_uid changes" do
-      item = Item.create!(:external_uid => 'post:banan.kanon$1')
-      item.external_uid = 'post:banan.kanon.rakett$1'
-      item.uid = 'snitchitem.post:banan.kanon.rakett$1'
-    end
-
-    it "fixes the external_uid when uid changes" do
-      item = Item.create!(:external_uid => 'post:banan.kanon$1')
-      item.uid = 'snitchitem.post:banan.kanon.rakett$1'
-      item.external_uid = 'post:banan.kanon.rakett$1'
-    end
-
+  it "fixes the uid when external_uid changes" do
+    item = Item.create!(:external_uid => 'post:banan.kanon$1')
+    item.external_uid = 'post:banan.kanon.rakett$1'
+    item.uid.should eq 'snitchitem.post:banan.kanon.rakett$1'
   end
 
 end
