@@ -22,8 +22,8 @@ class Item < ActiveRecord::Base
   scope :by_wildcard_external_uid, lambda { |uid|
     query = Pebbles::Uid.query(uid)
     scope = by_path(query.path)
-    scope = where(:klass => query.species) if query.species?
-    scope = where(:oid => query.oid) if query.oid?
+    scope = scope.where(:klass => query.species) if query.species?
+    scope = scope.where(:oid => query.oid) if query.oid?
     scope
   }
 
