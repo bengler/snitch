@@ -11,6 +11,8 @@ class Item < ActiveRecord::Base
 
   validates_inclusion_of :decision, :in => DECISIONS, :allow_nil => true
 
+  default_scope where("deleted_at is null")
+
   scope :unprocessed, where("decision is null")
   scope :processed, where("decision is not null")
   scope :fresh, where("not seen")

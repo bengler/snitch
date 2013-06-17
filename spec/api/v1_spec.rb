@@ -361,4 +361,42 @@ describe 'API v1' do
 
   end
 
+  context "items creation and deletion" do
+    context "with a god user" do
+      before(:each) do
+        god!
+      end
+      it "allows creation" do
+        post "/items/item:testrealm$somesort"
+        last_response.status.should eq 200
+        Item.count.should == 1
+      end
+      it "allows deletion" do
+        post "/items/item:testrealm$somesort"
+        uid = Item.last.uid
+        delete "/items/#{uid}"
+        last_response.status.should eq 200
+        Item.last.should eq nil
+        Item.unscoped.last.deleted_at.class.should_not eq nil
+      end
+      it "gives poper error when item doesn't exist" do
+        delete "/items/item:testrealm$somesort"
+        last_response.status.should eq 404
+      end
+    end
+    context "with a no-god user" do
+      before(:each) do
+        user!
+      end
+      it "disallows creation" do
+        post "/items/item:testrealm$somesort"
+        last_response.status.should eq 403
+      end
+      it "disallows deletion" do
+        delete "/items/item:testrealm$somesort"
+        last_response.status.should eq 403
+      end
+    end
+  end
+
 end

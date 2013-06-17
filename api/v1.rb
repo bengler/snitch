@@ -68,6 +68,10 @@ class SnitchV1 < Sinatra::Base
   #   "processed" (Items that have been decided upon),
   #   "reported" (all reported items, including items that have recieved a decision),
   #   "fresh" (any fresh content that has not been marked as seen by a moderator).
+  #   "removed" (Item that is removed by a moderator).
+  #   "not_removed" (Items that is not removed by a moderator - but anything else).
+  #   "seen_and_not_removed" (Items that is seen but not removed by moderator).
+  #   "kept" (Items that is explicity kept by a moderator).
   #   If not specified. Default scope is "pending".
   # @optional [String] sort_by Any of "created_at", "updated_at" or "action_at" Defaults to "created_at".
   # @optional [String] order Either "asc" or "desc". Defaults to "desc".
@@ -132,6 +136,26 @@ class SnitchV1 < Sinatra::Base
     require_god
     item = Item.find_or_create_by_uid(uid)
     pg :item, :locals => {:item => item}
+  end
+
+  # @apidoc
+  # Mark an item as deleted
+  # @description Mark item as deleted (no longer exists).
+  # @category Snitch
+  # @path /api/snitch/v1/items/:uid
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923
+  # @http DELETE
+  # @category Snitch
+  delete '/items/:uid' do |uid|
+    require_god
+    item = Item.find_by_uid(uid)
+    if item
+      item.deleted_at = Time.now
+      item.save
+      pg :item, :locals => {:item => item}
+    else
+      halt 404, "No such item"
+    end
   end
 
   # @apidoc
