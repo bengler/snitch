@@ -139,6 +139,26 @@ class SnitchV1 < Sinatra::Base
   end
 
   # @apidoc
+  # Mark an item as deleted
+  # @description Mark item as deleted (no longer exists).
+  # @category Snitch
+  # @path /api/snitch/v1/items/:uid
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923
+  # @http DELETE
+  # @category Snitch
+  delete '/items/:uid' do |uid|
+    require_god
+    item = Item.find_by_uid(uid)
+    if item
+      item.deleted_at = Time.now
+      item.save
+      pg :item, :locals => {:item => item}
+    else
+      halt 404, "No such item"
+    end
+  end
+
+  # @apidoc
   # Register a moderator decision
   #
   # @note Requires god
