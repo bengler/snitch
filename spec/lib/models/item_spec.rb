@@ -1,13 +1,31 @@
 require 'spec_helper'
 
 describe Item do
-  it "extracts the uid automatically from attributes hash" do
-    Item.create!(:uid => "post:banan.kanon$1")
-    Item.first.uid.should == "post:banan.kanon$1"
+
+  it "creates by external_uid" do
+    Item.create!(:external_uid => "post:banan.kanon$1")
+    Item.first.external_uid.should eq "post:banan.kanon$1"
+    Item.first.uid.should eq "snitchitem.post:banan.kanon$1"
   end
 
-  it "extracts the uid when creating via find_or_create_by_uid" do
-    Item.find_or_create_by_uid("post:banan.kanon$1")
-    Item.first.uid.should == "post:banan.kanon$1"
+  it "finds by external_uid" do
+    Item.create!(:external_uid => "post:banan.kanon$1")
+    Item.find_or_create_by_external_uid("post:banan.kanon$1")
+    Item.first.external_uid.should eq "post:banan.kanon$1"
+    Item.first.uid.should eq "snitchitem.post:banan.kanon$1"
   end
+
+  it "finds by wildcard uid" do
+    Item.create!(:external_uid => "post:banan.kanon$1")
+    Item.by_wildcard_external_uid("post:banan.kanon$1").first.uid.should eq "snitchitem.post:banan.kanon$1"
+    Item.first.external_uid.should eq "post:banan.kanon$1"
+    Item.first.uid.should eq "snitchitem.post:banan.kanon$1"
+  end
+
+  it "fixes the uid when external_uid changes" do
+    item = Item.create!(:external_uid => 'post:banan.kanon$1')
+    item.external_uid = 'post:banan.kanon.rakett$1'
+    item.uid.should eq 'snitchitem.post:banan.kanon.rakett$1'
+  end
+
 end

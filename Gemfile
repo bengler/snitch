@@ -17,7 +17,7 @@ gem 'pebbles-cors', :git => 'git://github.com/bengler/pebbles-cors.git'
 
 group :development, :test do
   gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git", :require => false
-  gem 'rspec', '~> 2.8'
+  gem 'rspec'
   gem 'rack-test'
   gem 'simplecov'
   gem 'timecop'

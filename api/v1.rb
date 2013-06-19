@@ -43,7 +43,7 @@ class SnitchV1 < Sinatra::Base
     kind = params[:kind]
     comment = params[:comment]
     existing_report = if reporter && kind.nil?
-      item = Item.find_by_uid(uid)
+      item = Item.find_by_external_uid(uid)
       Report.find_by_item_id_and_reporter_and_kind(item.id, reporter, nil) if item
     end
     if !existing_report
@@ -85,13 +85,12 @@ class SnitchV1 < Sinatra::Base
       # guaranatee exact same output order as input order
       uids = query.list
       items = []
-      uids.each { |uid| items << (item = Item.find_by_uid(uid); item ? item : {})}
+      uids.each { |uid| items << (item = Item.find_by_external_uid(uid); item ? item : {})}
       pagination = {:limit => items.count, :offset => 0, :last_page => true}
       return pg :items, :locals => {:items => items, :pagination => pagination}
     else
       params[:scope] ||= 'pending'
-      items = Item.by_path(query.path).order(
-        "#{sort_by_from_params} #{order_from_params}")
+      items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
       items = items.where(:klass => query.species) if query.species?
       items = case params[:scope]
         when 'not_removed'
@@ -123,6 +122,7 @@ class SnitchV1 < Sinatra::Base
   # @description This is used to notify snitch of the existence of a new resource (i.e. for moderating resources as it
   #   is submitted) To let snitch know a moderator has seen an item, post an action of the kind "seen" (any other action
   #   will also mark the item as seen).
+  # @note :uid is eventually stored as :external_uid on the Item
   # @category Snitch
   # @path /api/snitch/v1/items/:uid
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923
@@ -130,7 +130,7 @@ class SnitchV1 < Sinatra::Base
   # @category Snitch
   post '/items/:uid' do |uid|
     require_god
-    item = Item.find_or_create_by_uid(uid)
+    item = Item.find_or_create_by_external_uid(uid)
     pg :item, :locals => {:item => item}
   end
 
@@ -166,7 +166,7 @@ class SnitchV1 < Sinatra::Base
 
     action = nil
     ActiveRecord::Base.connection.transaction do
-      item = Item.find_or_create_by_uid(uid)
+      item = Item.find_or_create_by_external_uid(uid)
       action = Action.create!(params[:action].merge(
         :item => item, :identity => current_identity.id))
     end
@@ -190,8 +190,8 @@ class SnitchV1 < Sinatra::Base
       # One month ago
       since = Time.now-24*60*60*30
     end
-
-    items = Item.by_wildcard_uid(uid).where("action_at > ?", since)
+    items = Item.by_wildcard_external_uid(uid)
+    items = items.where("action_at > ?", since)
     actions = Action.where("item_id in (?)", items.map(&:id)).where(
       "created_at > ?", since).order("created_at desc")
     actions, pagination = limit_offset_collection(actions, params)
@@ -209,7 +209,7 @@ class SnitchV1 < Sinatra::Base
   # @required [String] uid Pebbles uid denoting a resource
   get '/items/:uid/reports' do |uid|
     require_action_allowed(:create, uid) # FIXME: Temporary until we have PSM3
-    item = Item.find_by_uid(uid)
+    item = Item.find_by_external_uid(uid)
     reports = (item ? item.reports : Report.where('false'))
     reports, pagination = limit_offset_collection(reports, params)
     pg :reports, :locals => {:reports => reports, :pagination => pagination}
