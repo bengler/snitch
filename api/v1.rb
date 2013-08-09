@@ -92,29 +92,38 @@ class SnitchV1 < Sinatra::Base
       params[:scope] ||= 'pending'
       items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
       items = items.where(:klass => query.species) if query.species?
-      items = case params[:scope]
-        when 'not_removed'
-          items.not_removed
-        when 'seen_and_not_removed'
-          items.seen_and_not_removed
-        when 'kept'
-          items.kept
-        when 'removed'
-          items.removed
-        when 'fresh'
-          items.fresh
-        when 'reported'
-          items.reported
-        when 'processed'
-          items.processed
-        when 'pending'
-          items.unprocessed.reported
-        else
-          halt 400, "Unknown scope #{params[:scope]}"
-      end
+      items = get_items_from_scope(params[:scope], items)
     end
     items, pagination = limit_offset_collection(items, params)
     pg :items, :locals => {:items => items, :pagination => pagination}
+  end
+
+  # @apidoc
+  # Return count on how many items there arefor a wildcard uid
+  #
+  #
+  # @category Snitch
+  # @path /api/snitch/v1/items/:uid/count
+  # @http GET
+  #
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.*/count
+  #
+  # @optional [String] scope The scope of the reports to fetch. Must be any of
+  #   "pending" (any reported items that have no registered decision),
+  #   "processed" (Items that have been decided upon),
+  #   "reported" (all reported items, including items that have recieved a decision),
+  #   "fresh" (any fresh content that has not been marked as seen by a moderator).
+  #   If not specified. Default scope is "pending".
+  get '/items/:uid/count' do |uid|
+    query = Pebbles::Uid.query(uid) if uid
+    query ||= Pebbles::Uid.query("*:#{params[:path]}") if params[:path]
+    query ||= Pebbles::Uid.query("*:#{current_identity.realm}.*")
+    params[:scope] ||= 'pending'
+    items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
+    items = items.where(:klass => query.species) if query.species?
+    items = get_items_from_scope(params[:scope], items)
+    content_type :json
+    {:uid => uid, :count => items.count}.to_json
   end
 
   # @apidoc
@@ -217,6 +226,29 @@ class SnitchV1 < Sinatra::Base
 
 
   helpers do
+
+    def get_items_from_scope(scope, items)
+      case scope
+        when 'not_removed'
+          items.not_removed
+        when 'seen_and_not_removed'
+          items.seen_and_not_removed
+        when 'kept'
+          items.kept
+        when 'removed'
+          items.removed
+        when 'fresh'
+          items.fresh
+        when 'reported'
+          items.reported
+        when 'processed'
+          items.processed
+        when 'pending'
+          items.unprocessed.reported
+        else
+          halt 400, "Unknown scope #{params[:scope]}"
+      end
+    end
 
     def order_from_params
       case params[:order]

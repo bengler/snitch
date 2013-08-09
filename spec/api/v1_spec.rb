@@ -366,4 +366,19 @@ describe 'API v1' do
 
   end
 
+  describe "counts" do
+    before(:each) do
+      user!
+    end
+
+    it "it get counts" do
+      post "/reports/klass1:apdm.calendar$1"
+      post "/reports/klass2:apdm.calendar$2"
+      post "/reports/klass2:apdm.blogs$3"
+
+      get "/items/*:apdm.*/count"
+      JSON.parse(last_response.body)['uid'].should eq "*:apdm.*"
+      JSON.parse(last_response.body)['count'].should eq 3
+    end
+  end
 end
