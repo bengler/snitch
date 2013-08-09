@@ -99,15 +99,14 @@ class SnitchV1 < Sinatra::Base
   end
 
   # @apidoc
-  # Return a paginated list of unprocessed reported resources (i.e. for a moderator to review).
+  # Return count on how many items there arefor a wildcard uid
   #
   #
   # @category Snitch
-  # @path /api/snitch/v1/items/:uid
+  # @path /api/snitch/v1/items/:uid/count
   # @http GET
   #
-  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$*
-  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$1,post.entry:acme.discussions.cats-vs-dogs$2
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.*/count
   #
   # @optional [String] scope The scope of the reports to fetch. Must be any of
   #   "pending" (any reported items that have no registered decision),
@@ -115,13 +114,6 @@ class SnitchV1 < Sinatra::Base
   #   "reported" (all reported items, including items that have recieved a decision),
   #   "fresh" (any fresh content that has not been marked as seen by a moderator).
   #   If not specified. Default scope is "pending".
-  # @optional [String] sort_by Any of "created_at", "updated_at" or "action_at" Defaults to "created_at".
-  # @optional [String] order Either "asc" or "desc". Defaults to "desc".
-  # @optional [Integer] offset Index of the first returned hit. Defaults to 0.
-  # @optional [Number] limit Maximum number of returned hits. Defaults to 10.
-  # @description You may also input a list of full UIDs, e.g GET /items/a.b.c$1,a.b.c$2,a.b.c$3. For this type of query
-  #   pagination will not be possible as it always returns the exact items and in the exact order as the input uid list.
-  #   If an item is not found, it will output a null item in the same position as the input.
   get '/items/:uid/count' do |uid|
     query = Pebbles::Uid.query(uid) if uid
     query ||= Pebbles::Uid.query("*:#{params[:path]}") if params[:path]
