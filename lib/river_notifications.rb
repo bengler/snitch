@@ -1,36 +1,24 @@
 require 'pebblebed'
 require 'petroglyph'
 
-require_relative 'models/item'
+require_relative 'models/report'
 
 class RiverNotifications < ActiveRecord::Observer
-  observe :item
+  observe :report
 
   def self.river
     @river ||= Pebblebed::River.new
   end
 
-  def after_create(item)
-    publish(item, :create)
+  def after_create(report)
+    publish(report, :create)
   end
 
-  def after_update(item)
-    if item.deleted?
-      publish(item, :delete)
-    else
-      publish(item, :update)
-    end
-  end
-
-  def after_destroy(item)
-    publish(item, :delete)
-  end
-
-  def publish(item, event)
+  def publish(report, event)
     self.class.river.publish(
       :event => event,
-      :uid => item.uid,
-      :attributes => item.to_petroglyph[:item]
+      :uid => report.uid,
+      :attributes => report.to_petroglyph[:report]
     )
   end
 

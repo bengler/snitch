@@ -244,7 +244,8 @@ describe 'API v1' do
       hash['reports'].size.should eq 4
       hash['reports'].each do |report_hash|
         report = report_hash['report']
-        report['uid'].should eq uid
+        report['uid'].should eq "snitchreport.#{uid}"
+        report['external_uid'].should eq uid
         report['reporter'].should_not be_nil
         report['created_at'].should_not be_nil
         report.should have_key 'kind'
@@ -287,7 +288,7 @@ describe 'API v1' do
       uid = 'post:realm$1'
       post "/reports/#{uid}", :kind => 'bollox', :comment => 'Hogwash!'
       report = Report.first
-      report.uid.should eq uid
+      report.uid.should eq "snitchreport.#{uid}"
       report.reporter.should eq 1
       report.kind.should eq 'bollox'
       report.comment.should eq 'Hogwash!'
@@ -341,6 +342,15 @@ describe 'API v1' do
     it "won't let me report a decision 'cause I'm nobody" do
       post "/items/thing:testrealm$thong/actions", :action => {:kind => 'kept'}
       last_response.status.should eq 403
+    end
+
+    it "sets the realm correctly" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      Item.count.should eq 1
+      item = Item.first
+      item.realm.should eq 'realm'
+      item.read_attribute(:realm).should eq 'realm'
     end
 
   end
