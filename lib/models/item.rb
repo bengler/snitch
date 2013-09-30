@@ -4,6 +4,7 @@ class Item < ActiveRecord::Base
 
   has_many :reports
   has_many :actions, :order => "created_at desc"
+  before_save :set_realm
 
   # Lists the valid decisions (must be a subset of Action::KINDS)
   DECISIONS = ['removed', 'kept']
@@ -43,6 +44,10 @@ class Item < ActiveRecord::Base
 
   def realm
     label_0
+  end
+
+  def set_realm
+    self.realm = label_0
   end
 
   def uid
