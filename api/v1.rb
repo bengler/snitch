@@ -38,6 +38,7 @@ class SnitchV1 < Sinatra::Base
   # @optional [String] comment A comment from the reporting user
   # @status 200 OK
   post '/reports/:uid' do |uid|
+    # TODO: halt 404 if no item exists for uid
     # Only look for existing reports for logged in users
     reporter = current_identity && current_identity[:id]
     kind = params[:kind]
