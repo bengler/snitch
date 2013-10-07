@@ -38,13 +38,12 @@ class SnitchV1 < Sinatra::Base
   # @optional [String] comment A comment from the reporting user
   # @status 200 OK
   post '/reports/:uid' do |uid|
-    # TODO: halt 404 if no item exists for uid
-    # Only look for existing reports for logged in users
+    item = Item.find_by_external_uid(uid)
+    halt 404, "No such item" unless item
     reporter = current_identity && current_identity[:id]
     kind = params[:kind]
     comment = params[:comment]
     existing_report = if reporter && kind.nil?
-      item = Item.find_by_external_uid(uid)
       Report.find_by_item_id_and_reporter_and_kind(item.id, reporter, nil) if item
     end
     if !existing_report

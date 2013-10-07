@@ -48,6 +48,9 @@ describe 'API v1' do
     it "gives me a list of unprocessed items" do
       checkpoint.should_receive(:get).at_least(1).times.with("/callbacks/allowed/create/thing:testrealm$5").and_return(access)
       10.times do |i|
+        Item.create!(:external_uid => "thing:testrealm$#{i}")
+      end
+      10.times do |i|
         post "/reports/thing:testrealm$#{i}"
       end
 
@@ -73,6 +76,7 @@ describe 'API v1' do
       Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
+          Item.create!(:external_uid => "thing:testrealm$#{i}")
           post "/reports/thing:testrealm$#{i}"
         end
       end
@@ -96,6 +100,7 @@ describe 'API v1' do
       Timecop.travel(Time.parse("2012-05-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
+          Item.create!(:external_uid => "thing:testrealm$#{i}")
           post "/reports/thing:testrealm$#{i}"
         end
       end
@@ -127,6 +132,7 @@ describe 'API v1' do
       Timecop.travel(Time.parse("2012-09-20T09:52:09+02:00"))
       3.times do |i|
         Timecop.travel(i.days.ago) do
+          Item.create!(:external_uid => "thing:testrealm$#{i}")
           post "/reports/thing:testrealm$#{i}"
         end
       end
@@ -158,8 +164,11 @@ describe 'API v1' do
 
     it "supports querying items by uid" do
 
+      Item.create!(:external_uid => "klass1:apdm.calendar$1")
       post "/reports/klass1:apdm.calendar$1"
+      Item.create!(:external_uid => "klass2:apdm.calendar$2")
       post "/reports/klass2:apdm.calendar$2"
+      Item.create!(:external_uid => "klass2:apdm.blogs$3")
       post "/reports/klass2:apdm.blogs$3"
 
       get "/items/*:apdm.*"
@@ -176,8 +185,11 @@ describe 'API v1' do
     end
 
     it "supports querying items by uids (multiple) with a null placeholder for missing items" do
+      Item.create!(:external_uid => "klass1:apdm.calendar$1")
       post "/reports/klass1:apdm.calendar$1"
+      Item.create!(:external_uid => "klass2:apdm.calendar$2")
       post "/reports/klass2:apdm.calendar$2"
+      Item.create!(:external_uid => "klass2:apdm.blogs$3")
       post "/reports/klass2:apdm.blogs$3"
 
       get "/items/klass1:apdm.calendar$1,klass2:apdm.calendar$2,klass2:apdm.blogs$3,klass2:apdm.blogs$4"
@@ -230,6 +242,7 @@ describe 'API v1' do
 
     it "provides a paginated list of reports for the given item" do
       uid = "item:testrealm$one"
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       post "/reports/#{uid}", :kind => 'offensive', :comment => 'Harsh language!'
       post "/reports/#{uid}", :kind => 'offensive', :comment => 'Simply intolerable!'
@@ -272,6 +285,7 @@ describe 'API v1' do
 
     it "accepts a report of objectionable content" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       report = Report.first
       report.item.external_uid.should eq uid
@@ -286,6 +300,7 @@ describe 'API v1' do
 
     it "accepts a report of objectionable content with kind and comment" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'bollox', :comment => 'Hogwash!'
       report = Report.first
       report.uid.should eq "snitchreport.#{uid}"
@@ -301,6 +316,7 @@ describe 'API v1' do
 
     it "quietly rejects multiple reports from same user of same content with no kind" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       post "/reports/#{uid}"
       last_response.status.should eq 200
@@ -311,6 +327,7 @@ describe 'API v1' do
 
     it "accepts multiple reports of same kind from same user of same content" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
       post "/reports/#{uid}", :kind => 'foo'
       last_response.status.should eq 200
@@ -321,12 +338,19 @@ describe 'API v1' do
 
     it "accepts multiple reports of distinct kinds from same user of same content" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
       post "/reports/#{uid}", :kind => 'bar'
       last_response.status.should eq 200
       Item.count.should eq 1
       item = Item.first
       item.report_count.should eq 2
+    end
+
+    it "disallows posting reports to a item that doesn't exist" do
+      uid = 'post:realm$1'
+      post "/reports/#{uid}", :kind => 'foo'
+      last_response.status.should eq 404
     end
 
     it "counts distinct reports distinctly" do
@@ -346,6 +370,7 @@ describe 'API v1' do
 
     it "sets the realm correctly" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
       Item.count.should eq 1
       item = Item.first
@@ -359,6 +384,7 @@ describe 'API v1' do
 
     it "accepts anonymous reports" do
       uid = 'post:realm$1'
+      Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       post "/reports/#{uid}"
       post "/reports/#{uid}"
@@ -382,6 +408,9 @@ describe 'API v1' do
     end
 
     it "it get counts" do
+      Item.create!(:external_uid => "klass1:apdm.calendar$1")
+      Item.create!(:external_uid => "klass2:apdm.calendar$2")
+      Item.create!(:external_uid => "klass2:apdm.blogs$3")
       post "/reports/klass1:apdm.calendar$1"
       post "/reports/klass2:apdm.calendar$2"
       post "/reports/klass2:apdm.blogs$3"
