@@ -89,9 +89,11 @@ class SnitchV1 < Sinatra::Base
       pagination = {:limit => items.count, :offset => 0, :last_page => true}
       return pg :items, :locals => {:items => items, :pagination => pagination}
     else
+      klasses = extract_klasses_from_query(query)
       params[:scope] ||= 'pending'
       items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
-      items = items.where(:klass => query.species) if query.species?
+      items = items.where(:klass => klasses) if klasses.any?
+      items = items.where(:klass => query.species) if query.species? and !klasses.any?
       items = get_items_from_scope(params[:scope], items)
     end
     items, pagination = limit_offset_collection(items, params)
@@ -286,6 +288,28 @@ class SnitchV1 < Sinatra::Base
       }
       collection = collection[0..limit-1]
       [collection, metadata]
+    end
+
+    def extract_klasses_from_query(query)
+      species_0 = nil
+      klasses = []
+      query_to_hash = query.to_hash
+      if query_to_hash[:species_0].is_a?(Array)
+        klasses = query_to_hash[:species_0]
+      else
+        query_to_hash.map do |key, value|
+          if key.to_s.match("species")
+            if key.to_s == "species_0"
+              species_0 = value
+            elsif species_0 and value.is_a?(Array)
+              value.each do |v|
+                klasses << "#{species_0}.#{v}"
+              end
+            end
+          end
+        end
+      end
+      klasses
     end
 
   end # helpers
