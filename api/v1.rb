@@ -293,11 +293,11 @@ class SnitchV1 < Sinatra::Base
     def extract_klasses_from_query(query)
       species_0 = nil
       klasses = []
-      qh = query.to_hash
-      if qh[:species_0].is_a?(Array)
-        klasses = qh[:species_0]
+      query_to_hash = query.to_hash
+      if query_to_hash[:species_0].is_a?(Array)
+        klasses = query_to_hash[:species_0]
       else
-        qh.map do |key, value|
+        query_to_hash.map do |key, value|
           if key.to_s.match("species")
             if key.to_s == "species_0"
               species_0 = value
