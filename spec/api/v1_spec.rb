@@ -196,6 +196,32 @@ describe 'API v1' do
       JSON.parse(last_response.body)['items'].select {|i| i['item']['uid'] == nil}.size.should == 1
     end
 
+    it "supports querying items by species query" do
+      Item.create!(:external_uid => "post.foo:apdm.calendar$1")
+      post "/reports/post.foo:apdm.calendar$1"
+      Item.create!(:external_uid => "post.bar:apdm.calendar$2")
+      post "/reports/post.bar:apdm.calendar$2"
+      Item.create!(:external_uid => "post.bogus:apdm.blogs$3")
+      post "/reports/post.bogus:apdm.blogs$3"
+      Item.create!(:external_uid => "foo.bogus:apdm.blogs$3")
+      post "/reports/foo.bogus:apdm.blogs$3"
+
+      Item.create!(:external_uid => "bim:apdm.blogs$3")
+      post "/reports/bim:apdm.blogs$3"
+      Item.create!(:external_uid => "bam:apdm.blogs$3")
+      post "/reports/bam:apdm.blogs$3"
+
+      get "/items/post.foo%7Cbar:apdm.*"
+      JSON.parse(last_response.body)['items'].size.should eq 2
+
+      get "/items/post.foo%7Cbar%7Cbogus:apdm.*"
+      JSON.parse(last_response.body)['items'].size.should eq 3
+
+      get "/items/bim%7Cbam:apdm.*"
+      JSON.parse(last_response.body)['items'].size.should eq 2
+
+    end
+
     it "only accepts valid actions" do
       checkpoint.should_receive(:post).with("/callbacks/allowed/create/item:testrealm$somesort").and_return(access)
       checkpoint.should_receive(:post).with("/callbacks/allowed/create/item:testrealm$othersort").and_return(access)
