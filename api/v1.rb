@@ -120,9 +120,11 @@ class SnitchV1 < Sinatra::Base
     query = Pebbles::Uid.query(uid) if uid
     query ||= Pebbles::Uid.query("*:#{params[:path]}") if params[:path]
     query ||= Pebbles::Uid.query("*:#{current_identity.realm}.*")
+    klasses = extract_klasses_from_query(query)
     params[:scope] ||= 'pending'
     items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
-    items = items.where(:klass => query.species) if query.species?
+    items = items.where(:klass => klasses) if klasses.any?
+    items = items.where(:klass => query.species) if query.species? and !klasses.any?
     items = get_items_from_scope(params[:scope], items)
     content_type :json
     {:uid => uid, :count => items.count}.to_json
