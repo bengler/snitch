@@ -162,6 +162,7 @@ class SnitchV1 < Sinatra::Base
   #
   # @path /api/snitch/v1/items/:uid/actions
   #
+  # @required [String] uid A full or a wildcard uid for what to register desicion on.
   # @required [JSON] action
   # @required [String] action[kind] One of "kept", "removed", "seen", "edited", "recommended" or "recommendation_revoked".
   # @optional [String] action[rationale] Optionally you can provide a "rationale" label to explain the reason for the
@@ -177,14 +178,33 @@ class SnitchV1 < Sinatra::Base
     halt 400, "No action given with request" unless params[:action]
     halt 400, "Decision must be one of #{Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])
 
-    action = nil
-    ActiveRecord::Base.connection.transaction do
-      item = Item.find_or_create_by_external_uid(uid)
-      action = Action.create!(params[:action].merge(
-        :item => item, :identity => current_identity.id))
+    query = Pebbles::Uid.query(uid) if uid
+
+    if query.oid
+      action = nil
+      ActiveRecord::Base.connection.transaction do
+        item = Item.find_or_create_by_external_uid(uid)
+        action = Action.create!(params[:action].merge(
+          :item => item, :identity => current_identity.id))
+      end
+      pg :action, :locals => {:action => action}
+    else
+      klasses = extract_klasses_from_query(query)
+      items = Item.by_path(query.path)
+      items = items.where(:klass => klasses) if klasses.any?
+      items = items.where(:klass => query.species) if query.species? and !klasses.any?
+      actions = []
+      ActiveRecord::Base.connection.transaction do
+        items.each do |item|
+          action = Action.create!(params[:action].merge(
+            :item => item, :identity => current_identity.id))
+          actions << action
+        end
+      end
+      pg :actions, :locals => {:actions => actions, :pagination => {}}
     end
-    pg :action, :locals => {:action => action}
   end
+
 
   # @apidoc
   # Get lists of moderator decisions

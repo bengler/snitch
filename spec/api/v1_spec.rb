@@ -43,6 +43,20 @@ describe 'API v1' do
       item.decider.should eq 1
     end
 
+    it "lets me report a decision on a wildcard path" do
+      uid = "thing:testrealm.calendar.*"
+      Item.create!(:external_uid => "thing:testrealm.calendar.facebook$123")
+      Item.create!(:external_uid => "thing:testrealm.calendar.origo$321")
+      Item.create!(:external_uid => "thing:testrealm.foo.bar$123")
+      checkpoint.should_receive(:post).at_least(1).times.with("/callbacks/allowed/create/#{uid}").and_return(access)
+      post "/items/#{uid}/actions", :action => {:kind => 'seen'}
+      last_response.status.should == 200
+      result = JSON.parse(last_response.body)['actions'].size.should eq 2
+      Item.find_by_external_uid("thing:testrealm.calendar.facebook$123").seen.should eq true
+      Item.find_by_external_uid("thing:testrealm.calendar.origo$321").seen.should eq true
+      Item.find_by_external_uid("thing:testrealm.foo.bar$123").seen.should eq false
+    end
+
     it "gives me a list of unprocessed items" do
       checkpoint.should_receive(:post).at_least(1).times.with("/callbacks/allowed/create/thing:testrealm$5").and_return(access)
       10.times do |i|
