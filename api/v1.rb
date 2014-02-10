@@ -150,7 +150,7 @@ class SnitchV1 < Sinatra::Base
   # @apidoc
   # Register a moderator decision
   #
-  # @note Requires god
+  # @note Requires moderator access
   # @description Actual removal of content is not performed by snitch, but this will remove the item from the
   #   default list returned by GET /items.
   #   Currently the user reporting a decision must be god of the given realm, but this should be considered a
@@ -173,12 +173,12 @@ class SnitchV1 < Sinatra::Base
   # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923/actions?action[kind]=kept
   #
   post '/items/:uid/actions' do |uid|
-    require_action_allowed(:create, uid)
+
+    query = Pebbles::Uid.query(uid) if uid
+    require_action_allowed(:create, uid) if query.oid
 
     halt 400, "No action given with request" unless params[:action]
     halt 400, "Decision must be one of #{Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])
-
-    query = Pebbles::Uid.query(uid) if uid
 
     if query.oid
       action = nil
@@ -189,19 +189,26 @@ class SnitchV1 < Sinatra::Base
       end
       pg :action, :locals => {:action => action}
     else
+      action = params[:action]
+      kind = action["kind"]
       klasses = extract_klasses_from_query(query)
       items = Item.by_path(query.path)
       items = items.where(:klass => klasses) if klasses.any?
       items = items.where(:klass => query.species) if query.species? and !klasses.any?
-      actions = []
-      ActiveRecord::Base.connection.transaction do
-        items.each do |item|
-          action = Action.create!(params[:action].merge(
-            :item => item, :identity => current_identity.id))
-          actions << action
+      if items.count > 0
+        require_action_allowed(:create, items.first.external_uid)
+        if kind == 'seen'
+          items.update_all("seen = true")
+        elsif Item::DECISIONS.include?(kind)
+          items.update_all("seen = true, desicion = '#{kind}', decider = #{current_identity.id}")
         end
+        item = items.first
+        action = Action.create!(params[:action].merge(
+            :item => item, :identity => current_identity.id))
+        pg :action, :locals => {:action => action}
+      else
+        halt 404, "No items found for #{uid}"
       end
-      pg :actions, :locals => {:actions => actions, :pagination => {}}
     end
   end
 
