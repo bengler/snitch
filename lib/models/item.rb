@@ -7,7 +7,7 @@ class Item < ActiveRecord::Base
   before_save :set_realm
 
   # Lists the valid decisions (must be a subset of Action::KINDS)
-  DECISIONS = ['removed', 'kept']
+  DECISIONS = ['removed', 'kept', 'published']
 
   validates_inclusion_of :decision, :in => DECISIONS, :allow_nil => true
 
