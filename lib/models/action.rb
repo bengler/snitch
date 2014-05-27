@@ -1,7 +1,7 @@
 class Action < ActiveRecord::Base
   belongs_to :item, :touch => :action_at
 
-  KINDS = ['removed', 'kept', 'edited', 'seen', 'recommended', 'recommendation_revoked']
+  KINDS = ['removed', 'kept', 'edited', 'seen', 'recommended', 'recommendation_revoked', 'published']
 
   validates_inclusion_of :kind, :in => KINDS
 
