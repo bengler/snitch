@@ -16,6 +16,7 @@ class Item < ActiveRecord::Base
   scope :fresh, where("not seen")
   scope :reported, where("report_count > 0")
   scope :kept, where("decision = 'kept'")
+  scope :published, where("decision = 'published'")
   scope :removed, where("decision = 'removed'")
   scope :seen_and_not_removed, where("seen is true and (decision != 'removed' or decision is null)")
   scope :not_removed, where("decision != 'removed' or decision is null")
