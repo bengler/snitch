@@ -4,19 +4,19 @@ gem 'rake'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'sinatra-activerecord', :require => false
-gem 'rack-contrib', :git => 'git://github.com/rack/rack-contrib.git'
+gem 'rack-contrib', :git => 'https://github.com/rack/rack-contrib'
 gem 'rack-protection', '~> 1.3.2'
-gem 'activerecord', '~> 3.2.12', :require => 'active_record'
+gem 'activerecord', '~> 3.2.18', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
 gem 'pebblebed', '~> 0.1.3'
 gem 'pebbles-path'
 gem 'pebbles-uid'
-gem 'pebbles-cors', :git => 'git://github.com/bengler/pebbles-cors.git'
+gem 'pebbles-cors', :git => 'https://github.com/bengler/pebbles-cors'
 
 group :development, :test do
-  gem 'bengler_test_helper',  :git => "git://github.com/bengler/bengler_test_helper.git", :require => false
+  gem 'bengler_test_helper',  :git => "https://github.com/bengler/bengler_test_helper", :require => false
   gem 'rspec'
   gem 'rack-test'
   gem 'simplecov'
