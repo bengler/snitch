@@ -73,7 +73,7 @@ GEM
     pebbles-uid (0.0.16)
     petroglyph (0.0.3)
       tilt
-    pg (0.12.2)
+    pg (0.17.1)
     queryparams (0.0.3)
     rack (1.5.2)
     rack-protection (1.3.2)
