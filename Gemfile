@@ -10,7 +10,7 @@ gem 'activerecord', '~> 3.2.18', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
-gem 'pebblebed', '~> 0.1.3'
+gem 'pebblebed', '~> 0.2.1'
 gem 'pebbles-path'
 gem 'pebbles-uid'
 gem 'pebbles-cors', :git => 'https://github.com/bengler/pebbles-cors'
@@ -25,5 +25,5 @@ end
 
 group :production do
   gem 'airbrake', '~> 3.1.4', :require => false
-  gem 'unicorn', '~> 4.1.1'
+  gem 'unicorn'
 end
