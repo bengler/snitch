@@ -444,6 +444,31 @@ describe 'API v1' do
 
   end
 
+  describe "with god user" do
+
+    before(:each) do
+      god!
+    end
+
+    it "allows item to be unseen" do
+      post "/items/thing:testrealm$1"
+
+      get "/items/thing:testrealm.*", scope: 'fresh'
+      result = JSON.parse(last_response.body)
+      result['items'][0]['item']['uid'].should eq 'snitchitem.thing:testrealm$1'
+
+      post "/items/thing:testrealm$1/actions", :action => {:kind => 'seen'}
+      get "/items/thing:testrealm.*", scope: 'fresh'
+      result = JSON.parse(last_response.body)
+      result["items"].should eq []
+
+      post "/items/thing:testrealm$1/unsee"
+      get "/items/thing:testrealm.*", scope: 'fresh'
+      result = JSON.parse(last_response.body)
+      result['items'][0]['item']['uid'].should eq 'snitchitem.thing:testrealm$1'
+    end
+  end
+
   describe "counts" do
     before(:each) do
       user!

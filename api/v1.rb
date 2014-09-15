@@ -147,6 +147,25 @@ class SnitchV1 < Sinatra::Base
     pg :item, :locals => {:item => item}
   end
 
+
+  # @apidoc
+  # Resets an item's seen status
+  # @description This is useful for items that have been seen, then edited later on, and should be reviewed by a moderator again.
+  # @note Only the seen status is reset. Decisions, actions and reports are kept for the item.
+  # @category Snitch
+  # @path /api/snitch/v1/items/:uid/reset
+  # @example /api/snitch/v1/items/post.entry:acme.discussions.cats-vs-dogs$99923/reset
+  # @http POST
+  # @category Snitch
+  post '/items/:uid/unsee' do |uid|
+    require_god
+    item = Item.find_by_external_uid(uid)
+    halt 404, "Not found" unless item
+    item.seen = false
+    item.save
+    pg :item, :locals => {:item => item}
+  end
+
   # @apidoc
   # Register a moderator decision
   #
