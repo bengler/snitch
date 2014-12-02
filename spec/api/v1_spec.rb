@@ -390,6 +390,19 @@ describe 'API v1' do
       last_response.status.should eq 404
     end
 
+    it "resets the decision on an item if it gets reported" do
+      uid = 'post:realm$1'
+      Item.create!(:external_uid => uid, :decision => "kept", :decider => 1)
+      Item.count.should eq 1
+      Item.first.decision.should eq 'kept'
+      post "/reports/#{uid}", :kind => 'foo'
+      last_response.status.should eq 200
+      Item.count.should eq 1
+      item = Item.first
+      item.decision.should be_nil
+      item.decider.should be_nil
+    end
+
     it "counts distinct reports distinctly" do
       Report.create!(:uid => "dings:blah$1", :reporter => 4)
       Report.create!(:uid => "dings:blah$1", :reporter => 2)

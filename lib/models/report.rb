@@ -2,7 +2,7 @@ class Report < ActiveRecord::Base
   include Petroglyphy
 
   belongs_to :item, :counter_cache => :report_count
-  before_create :ensure_item
+  before_create :ensure_item, :unset_decision
 
   def uid=(value)
     if !new_record? && self.uid != value
@@ -20,6 +20,13 @@ class Report < ActiveRecord::Base
   end
 
   private
+
+  def unset_decision
+    item = self.item
+    item.decision = nil
+    item.decider = nil
+    item.save
+  end
 
   # TODO: get rid of this. A report cannot exist witout an item.
   def ensure_item
