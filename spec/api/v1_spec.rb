@@ -35,12 +35,12 @@ describe 'API v1' do
       uid = "thing:testrealm$thong"
       post "/items/#{uid}/actions", :action => {:kind => 'kept'}
       item = Item.first
-      item.uid.should eq "snitchitem.#{uid}"
-      item.external_uid.should eq uid
-      item.report_count.should eq 0
-      item.decision.should eq 'kept'
-      item.action_at.should_not be_nil
-      item.decider.should eq 1
+      expect(item.uid).to eq "snitchitem.#{uid}"
+      expect(item.external_uid).to eq uid
+      expect(item.report_count).to eq 0
+      expect(item.decision).to eq 'kept'
+      expect(item.action_at).to_not be_nil
+      expect(item.decider).to eq 1
     end
 
     it "lets me report a decision on a wildcard path" do
@@ -50,10 +50,10 @@ describe 'API v1' do
       Item.create!(:external_uid => "thing:testrealm.foo.bar$123")
       checkpoint.should_receive(:post).at_least(1).times.with("/callbacks/allowed/create/thing:testrealm.calendar.facebook$123").and_return(access)
       post "/items/#{uid}/actions", :action => {:kind => 'seen'}
-      last_response.status.should == 200
-      Item.find_by_external_uid("thing:testrealm.calendar.facebook$123").seen.should eq true
-      Item.find_by_external_uid("thing:testrealm.calendar.origo$321").seen.should eq true
-      Item.find_by_external_uid("thing:testrealm.foo.bar$123").seen.should eq false
+      expect(last_response.status).to eq 200
+      expect(Item.find_by_external_uid("thing:testrealm.calendar.facebook$123").seen).to eq true
+      expect(Item.find_by_external_uid("thing:testrealm.calendar.origo$321").seen).to eq true
+      expect(Item.find_by_external_uid("thing:testrealm.foo.bar$123").seen).to eq false
     end
 
     it "gives me a list of unprocessed items" do
@@ -71,7 +71,7 @@ describe 'API v1' do
       oids = result['items'].map do |record|
         record['item']['external_uid'][/\$\d*$/][1..-1]
       end
-      oids.should eq ["9", "8", "7", "6", "5", "4", "3", "2", "1", "0"]
+      expect(oids).to eq ["9", "8", "7", "6", "5", "4", "3", "2", "1", "0"]
 
       # Register a decision and see the item is removed from the list
       post "/items/thing:testrealm$5/actions", :action => {:kind => 'removed'}
@@ -80,7 +80,7 @@ describe 'API v1' do
       oids = result['items'].map do |record|
         record['item']['uid'][/\$\d*$/][1..-1]
       end
-      oids.should eq ["9", "8", "7", "6", "4", "3", "2", "1", "0"] # < with '5' removed
+      expect(oids).to eq ["9", "8", "7", "6", "4", "3", "2", "1", "0"] # < with '5' removed
     end
 
     it "supports sorting on created_at in both orders" do
@@ -97,14 +97,14 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['created_at']
       end
-      dates.should == ["2012-05-20T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-18T11:52:09+02:00"]
+      expect(dates.sort{|a,b| b <=> a }).to eq dates
 
       get "/items", :path => "testrealm", :sort_by => "created_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['created_at']
       end
-      dates.should == ["2012-05-18T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
+      expect(dates.sort{|a,b| a <=> b }).to eq dates
     end
 
     it "supports sorting on updated_at in both orders" do
@@ -126,14 +126,14 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['updated_at']
       end
-      dates.should == ["2012-05-20T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-18T11:52:09+02:00"]
+      expect(dates.sort{|a,b| b <=> a }).to eq dates
 
       get "/items", :path => "testrealm", :sort_by => "updated_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['updated_at']
       end
-      dates.should == ["2012-05-18T11:52:09+02:00", "2012-05-19T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
+      expect(dates.sort{|a,b| a <=> b }).to eq dates
     end
 
     it "supports sorting on action_at in both orders" do
@@ -163,14 +163,14 @@ describe 'API v1' do
       dates = result['items'].map do |record|
         record['item']['action_at']
       end
-      dates.should == ["2012-08-20T11:52:09+02:00", "2012-07-20T11:52:09+02:00", "2012-05-20T11:52:09+02:00"]
+      expect(dates.sort{|a,b| b <=> a }).to eq dates
 
       get "/items", :path => "testrealm", :sort_by => "action_at", :order => "asc"
       result = JSON.parse(last_response.body)
       dates = result['items'].map do |record|
         record['item']['action_at']
       end
-      dates.should == ["2012-05-20T11:52:09+02:00", "2012-07-20T11:52:09+02:00", "2012-08-20T11:52:09+02:00"]
+      expect(dates.sort{|a,b| a <=> b }).to eq dates
     end
 
     it "supports querying items by uid" do
@@ -183,16 +183,16 @@ describe 'API v1' do
       post "/reports/klass2:apdm.blogs$3"
 
       get "/items/*:apdm.*"
-      JSON.parse(last_response.body)['items'].size.should eq 3
+      expect(JSON.parse(last_response.body)['items'].size).to eq 3
 
       get "/items/*:mittap.*"
-      JSON.parse(last_response.body)['items'].size.should eq 0
+      expect(JSON.parse(last_response.body)['items'].size).to eq 0
 
       get "/items/klass2:*"
-      JSON.parse(last_response.body)['items'].size.should eq 2
+      expect(JSON.parse(last_response.body)['items'].size).to eq 2
 
       get "/items/klass2:apdm.blogs"
-      JSON.parse(last_response.body)['items'].size.should eq 1
+      expect(JSON.parse(last_response.body)['items'].size).to eq 1
     end
 
     it "supports querying items by uids (multiple) with a null placeholder for missing items" do
@@ -204,9 +204,9 @@ describe 'API v1' do
       post "/reports/klass2:apdm.blogs$3"
 
       get "/items/klass1:apdm.calendar$1,klass2:apdm.calendar$2,klass2:apdm.blogs$3,klass2:apdm.blogs$4"
-      JSON.parse(last_response.body)['items'].size.should eq 4
-      JSON.parse(last_response.body)['items'].last['uid'].should be_nil
-      JSON.parse(last_response.body)['items'].select {|i| i['item']['uid'] == nil}.size.should == 1
+      expect(JSON.parse(last_response.body)['items'].size).to eq 4
+      expect(JSON.parse(last_response.body)['items'].last['uid']).to be_nil
+      expect(JSON.parse(last_response.body)['items'].select {|i| i['item']['uid'] == nil}.size).to eq 1
     end
 
     it "supports querying items by species query" do
@@ -225,13 +225,13 @@ describe 'API v1' do
       post "/reports/bam:apdm.blogs$3"
 
       get "/items/post.foo%7Cbar:apdm.*"
-      JSON.parse(last_response.body)['items'].size.should eq 2
+      expect(JSON.parse(last_response.body)['items'].size).to eq 2
 
       get "/items/post.foo%7Cbar%7Cbogus:apdm.*"
-      JSON.parse(last_response.body)['items'].size.should eq 3
+      expect(JSON.parse(last_response.body)['items'].size).to eq 3
 
       get "/items/bim%7Cbam:apdm.*"
-      JSON.parse(last_response.body)['items'].size.should eq 2
+      expect(JSON.parse(last_response.body)['items'].size).to eq 2
 
     end
 
@@ -240,18 +240,18 @@ describe 'API v1' do
       checkpoint.should_receive(:post).with("/callbacks/allowed/create/item:testrealm$othersort").and_return(access)
       checkpoint.should_receive(:post).with("/callbacks/allowed/create/item:testrealm$thirdkind").and_return(access)
       post "/items/item:testrealm$somesort/actions", :action => {:kind => 'kept'}
-      last_response.status.should eq 200
+      expect(last_response.status).to eq 200
       post "/items/item:testrealm$othersort/actions", :action => {:kind => 'removed'}
-      last_response.status.should eq 200
+      expect(last_response.status).to eq 200
       post "/items/item:testrealm$thirdkind/actions", :action => {:kind => 'beloved'}
-      last_response.status.should eq 400
-      Action.count.should == 2
+      expect(last_response.status).to eq 400
+      expect(Action.count).to eq 2
     end
 
     it "denies access accross realms" do
       checkpoint.should_not_receive(:post).at_least(1).times.with("/callbacks/allowed/create/item:foo$somesort").and_return(access_denied)
       post "/items/item:foo$somesort/actions", :action => {:kind => 'kept'}
-      last_response.status.should eq 403
+      expect(last_response.status).to eq 403
     end
 
     it "provides a lists of recent actions" do
@@ -263,18 +263,18 @@ describe 'API v1' do
       post "/items/item:testrealm.subitem$three/actions", :action => {:kind => 'edited'}
       post "/items/otherklass:testrealm$two/actions", :action => {:kind => 'edited'}
       get "/items/*:*/actions"
-      JSON.parse(last_response.body)['actions'].size.should == 4
+      expect(JSON.parse(last_response.body)['actions'].size).to eq 4
 
       get "/items/item:*/actions"
-      JSON.parse(last_response.body)['actions'].size.should == 3
+      expect(JSON.parse(last_response.body)['actions'].size).to eq 3
 
       get "/items/*:testrealm/actions"
-      JSON.parse(last_response.body)['actions'].size.should == 3
+      expect(JSON.parse(last_response.body)['actions'].size).to eq 3
 
       get "/items/item:testrealm.*/actions"
-      JSON.parse(last_response.body)['actions'].size.should == 3
+      expect(JSON.parse(last_response.body)['actions'].size).to eq 3
       get "/items/item:testrealm.*$one/actions"
-      JSON.parse(last_response.body)['actions'].size.should == 2
+      expect(JSON.parse(last_response.body)['actions'].size).to eq 2
     end
 
     it "provides a paginated list of reports for the given item" do
@@ -287,19 +287,19 @@ describe 'API v1' do
       checkpoint.should_receive(:post).at_least(1).times.
         with("/callbacks/allowed/create/#{uid}").and_return(access)
       get "/items/#{uid}/reports"
-      last_response.status.should eq 200
+      expect(last_response.status).to eq 200
       hash = JSON.parse(last_response.body)
-      hash.should have_key 'pagination'
-      hash.should have_key 'reports'
-      hash['reports'].size.should eq 4
+      expect(hash).to have_key 'pagination'
+      expect(hash).to have_key 'reports'
+      expect(hash['reports'].size).to eq 4
       hash['reports'].each do |report_hash|
         report = report_hash['report']
-        report['uid'].should eq "snitchreport.#{uid}"
-        report['external_uid'].should eq uid
-        report['reporter'].should_not be_nil
-        report['created_at'].should_not be_nil
-        report.should have_key 'kind'
-        report.should have_key 'comment'
+        expect(report['uid']).to eq "snitchreport.#{uid}"
+        expect(report['external_uid']).to eq uid
+        expect(report['reporter']).to_not be_nil
+        expect(report['created_at']).to_not be_nil
+        expect(report).to have_key 'kind'
+        expect(report).to have_key 'comment'
       end
     end
 
@@ -308,10 +308,10 @@ describe 'API v1' do
       checkpoint.should_receive(:post).at_least(1).times.
         with("/callbacks/allowed/create/#{uid}").and_return(access)
       get "/items/#{uid}/reports"
-      last_response.status.should eq 200
+      expect(last_response.status).to eq 200
       hash = JSON.parse(last_response.body)
-      hash.should have_key 'reports'
-      hash['reports'].size.should eq 0
+      expect(hash).to have_key 'reports'
+      expect(hash['reports'].size).to eq 0
     end
   end
 
@@ -325,14 +325,14 @@ describe 'API v1' do
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       report = Report.first
-      report.item.external_uid.should eq uid
-      report.reporter.should eq 1
-      report.kind.should be_nil
-      report.comment.should be_nil
+      expect(report.item.external_uid).to eq uid
+      expect(report.reporter).to eq 1
+      expect(report.kind).to be_nil
+      expect(report.comment).to be_nil
       item = Item.first
-      item.realm.should eq "realm"
-      item.external_uid.should eq uid
-      item.report_count.should eq 1
+      expect(item.realm).to eq "realm"
+      expect(item.external_uid).to eq uid
+      expect(item.report_count).to eq 1
     end
 
     it "accepts a report of objectionable content with kind and comment" do
@@ -340,15 +340,15 @@ describe 'API v1' do
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'bollox', :comment => 'Hogwash!'
       report = Report.first
-      report.uid.should eq "snitchreport.#{uid}"
-      report.reporter.should eq 1
-      report.kind.should eq 'bollox'
-      report.comment.should eq 'Hogwash!'
+      expect(report.uid).to eq "snitchreport.#{uid}"
+      expect(report.reporter).to eq 1
+      expect(report.kind).to eq 'bollox'
+      expect(report.comment).to eq 'Hogwash!'
       item = Item.first
-      item.realm.should eq "realm"
-      item.uid.should eq "snitchitem.#{uid}"
-      item.external_uid.should eq uid
-      item.report_count.should eq 1
+      expect(item.realm).to eq "realm"
+      expect(item.uid).to eq "snitchitem.#{uid}"
+      expect(item.external_uid).to eq uid
+      expect(item.report_count).to eq 1
     end
 
     it "quietly rejects multiple reports from same user of same content with no kind" do
@@ -356,10 +356,10 @@ describe 'API v1' do
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}"
       post "/reports/#{uid}"
-      last_response.status.should eq 200
-      Item.count.should eq 1
+      expect(last_response.status).to eq 200
+      expect(Item.count).to eq 1
       item = Item.first
-      item.report_count.should eq 1
+      expect(item.report_count).to eq 1
     end
 
     it "accepts multiple reports of same kind from same user of same content" do
@@ -367,10 +367,10 @@ describe 'API v1' do
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
       post "/reports/#{uid}", :kind => 'foo'
-      last_response.status.should eq 200
-      Item.count.should eq 1
+      expect(last_response.status).to eq 200
+      expect(Item.count).to eq 1
       item = Item.first
-      item.report_count.should eq 2
+      expect(item.report_count).to eq 2
     end
 
     it "accepts multiple reports of distinct kinds from same user of same content" do
@@ -378,29 +378,29 @@ describe 'API v1' do
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
       post "/reports/#{uid}", :kind => 'bar'
-      last_response.status.should eq 200
-      Item.count.should eq 1
+      expect(last_response.status).to eq 200
+      expect(Item.count).to eq 1
       item = Item.first
-      item.report_count.should eq 2
+      expect(item.report_count).to eq 2
     end
 
     it "disallows posting reports to a item that doesn't exist" do
       uid = 'post:realm$1'
       post "/reports/#{uid}", :kind => 'foo'
-      last_response.status.should eq 404
+      expect(last_response.status).to eq 404
     end
 
     it "resets the decision on an item if it gets reported" do
       uid = 'post:realm$1'
       Item.create!(:external_uid => uid, :decision => "kept", :decider => 1)
-      Item.count.should eq 1
-      Item.first.decision.should eq 'kept'
+      expect(Item.count).to eq 1
+      expect(Item.first.decision).to eq 'kept'
       post "/reports/#{uid}", :kind => 'foo'
-      last_response.status.should eq 200
-      Item.count.should eq 1
+      expect(last_response.status).to eq 200
+      expect(Item.count).to eq 1
       item = Item.first
-      item.decision.should be_nil
-      item.decider.should be_nil
+      expect(item.decision).to be_nil
+      expect(item.decider).to be_nil
     end
 
     it "counts distinct reports distinctly" do
@@ -409,8 +409,8 @@ describe 'API v1' do
       Report.create!(:uid => "dings:blah$1", :reporter => 3)
       Report.create!(:uid => "dings:blah$2", :reporter => 4)
       post "/reports/dings:blah$1"
-      Item.find_by_external_uid("dings:blah$1").report_count.should eq 4
-      Item.find_by_external_uid("dings:blah$2").report_count.should eq 1
+      expect(Item.find_by_external_uid("dings:blah$1").report_count).to eq 4
+      expect(Item.find_by_external_uid("dings:blah$2").report_count).to eq 1
     end
 
     it "won't let me report a decision 'cause I'm no admin" do
@@ -420,17 +420,17 @@ describe 'API v1' do
       checkpoint.should_receive(:get).at_least(1).times.with("/identities/me").and_return(group_user)
       Pebblebed::Connector.any_instance.stub(:checkpoint => checkpoint)
       post "/items/#{uid}/actions", :action => {:kind => 'kept'}
-      last_response.status.should eq 403
+      expect(last_response.status).to eq 403
     end
 
     it "sets the realm correctly" do
       uid = 'post:realm$1'
       Item.create!(:external_uid => uid)
       post "/reports/#{uid}", :kind => 'foo'
-      Item.count.should eq 1
+      expect(Item.count).to eq 1
       item = Item.first
-      item.realm.should eq 'realm'
-      item.read_attribute(:realm).should eq 'realm'
+      expect(item.realm).to eq 'realm'
+      expect(item.read_attribute(:realm)).to eq 'realm'
     end
 
   end
@@ -444,15 +444,15 @@ describe 'API v1' do
       post "/reports/#{uid}"
       post "/reports/#{uid}"
       report = Report.first
-      report.reporter.should be_nil
-      report.item.external_uid.should eq uid
-      report.item.uid.should eq "snitchitem.#{uid}"
-      report.item.report_count.should eq 3
+      expect(report.reporter).to be_nil
+      expect(report.item.external_uid).to eq uid
+      expect(report.item.uid).to eq "snitchitem.#{uid}"
+      expect(report.item.report_count).to eq 3
     end
 
     it "won't let me report a decision 'cause I'm nobody" do
       post "/items/thing:testrealm$thong/actions", :action => {:kind => 'kept'}
-      last_response.status.should eq 403
+      expect(last_response.status).to eq 403
     end
 
   end
@@ -468,17 +468,17 @@ describe 'API v1' do
 
       get "/items/thing:testrealm.*", scope: 'fresh'
       result = JSON.parse(last_response.body)
-      result['items'][0]['item']['uid'].should eq 'snitchitem.thing:testrealm$1'
+      expect(result['items'][0]['item']['uid']).to eq 'snitchitem.thing:testrealm$1'
 
       post "/items/thing:testrealm$1/actions", :action => {:kind => 'seen'}
       get "/items/thing:testrealm.*", scope: 'fresh'
       result = JSON.parse(last_response.body)
-      result["items"].should eq []
+      expect(result["items"]).to eq []
 
       post "/items/thing:testrealm$1/unsee"
       get "/items/thing:testrealm.*", scope: 'fresh'
       result = JSON.parse(last_response.body)
-      result['items'][0]['item']['uid'].should eq 'snitchitem.thing:testrealm$1'
+      expect(result['items'][0]['item']['uid']).to eq 'snitchitem.thing:testrealm$1'
     end
   end
 
@@ -496,8 +496,8 @@ describe 'API v1' do
       post "/reports/klass2:apdm.blogs$3"
 
       get "/items/*:apdm.*/count"
-      JSON.parse(last_response.body)['uid'].should eq "*:apdm.*"
-      JSON.parse(last_response.body)['count'].should eq 3
+      expect(JSON.parse(last_response.body)['uid']).to eq "*:apdm.*"
+      expect(JSON.parse(last_response.body)['count']).to eq 3
     end
   end
 end
