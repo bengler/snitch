@@ -3,7 +3,8 @@ class Item < ActiveRecord::Base
   include Petroglyphy
 
   has_many :reports
-  has_many :actions, :order => "created_at desc"
+  has_many :actions, -> { order "created_at desc" }
+
   before_save :set_realm
 
   # Lists the valid decisions (must be a subset of Action::KINDS)
@@ -11,15 +12,15 @@ class Item < ActiveRecord::Base
 
   validates_inclusion_of :decision, :in => DECISIONS, :allow_nil => true
 
-  scope :unprocessed, where("decision is null")
-  scope :processed, where("decision is not null")
-  scope :fresh, where("not seen")
-  scope :reported, where("report_count > 0")
-  scope :kept, where("decision = 'kept'")
-  scope :published, where("decision = 'published'")
-  scope :removed, where("decision = 'removed'")
-  scope :seen_and_not_removed, where("seen is true and (decision != 'removed' or decision is null)")
-  scope :not_removed, where("decision != 'removed' or decision is null")
+  scope :unprocessed, -> { where("decision is null") }
+  scope :processed, -> { where("decision is not null") }
+  scope :fresh, -> { where("not seen") }
+  scope :reported, -> { where("report_count > 0") }
+  scope :kept, -> { where("decision = 'kept'") }
+  scope :published, -> { where("decision = 'published'") }
+  scope :removed, -> { where("decision = 'removed'") }
+  scope :seen_and_not_removed, -> { where("seen is true and (decision != 'removed' or decision is null)") }
+  scope :not_removed, -> { where("decision != 'removed' or decision is null") }
 
   scope :by_wildcard_external_uid, lambda { |uid|
     query = Pebbles::Uid.query(uid)
