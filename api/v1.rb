@@ -8,6 +8,7 @@ Dir.glob("#{File.dirname(__FILE__)}/v1/**/*.rb").each{ |file| require file }
 
 class SnitchV1 < Sinatra::Base
   set :root, "#{File.dirname(__FILE__)}/v1"
+  set :environment, ENV['RACK_ENV'].to_sym
 
   register Sinatra::Pebblebed
 

@@ -1,22 +1,22 @@
 source 'https://rubygems.org'
 
 gem 'rake'
-gem 'sinatra'
+gem 'sinatra', require: 'sinatra/base'
 gem 'sinatra-contrib'
 gem 'sinatra-activerecord', :require => false
 gem 'rack-contrib', :git => 'https://github.com/rack/rack-contrib'
 gem 'rack-protection', '~> 1.5.2'
-gem 'activerecord', '~> 3.2.18', :require => 'active_record'
+gem 'activerecord', '~> 4.2.5', :require => 'active_record'
 gem 'pg'
 gem 'yajl-ruby', :require => "yajl"
 gem 'petroglyph'
-gem 'pebblebed', '~> 0.2.1'
+gem 'pebblebed'
 gem 'pebbles-path'
 gem 'pebbles-uid'
 gem 'pebbles-cors', :git => 'https://github.com/bengler/pebbles-cors'
+gem 'rails-observers', '~> 0.1', require: false
 
 group :development, :test do
-  gem 'bengler_test_helper',  :git => "https://github.com/bengler/bengler_test_helper", :require => false
   gem 'rspec'
   gem 'rack-test'
   gem 'simplecov'
