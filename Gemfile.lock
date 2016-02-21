@@ -7,14 +7,6 @@ GIT
       pebblebed
       rack
 
-GIT
-  remote: https://github.com/rack/rack-contrib
-  revision: ea0c82dc3a6353542b7fe0cbd262c43378e28b31
-  specs:
-    rack-contrib (1.4.0)
-      git-version-bump (~> 0.15)
-      rack (~> 1.4)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -74,6 +66,9 @@ GEM
     pg (0.18.4)
     queryparams (0.0.3)
     rack (1.6.4)
+    rack-contrib (1.4.0)
+      git-version-bump (~> 0.15)
+      rack (~> 1.4)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
@@ -137,7 +132,7 @@ DEPENDENCIES
   pebbles-uid
   petroglyph
   pg
-  rack-contrib!
+  rack-contrib
   rack-protection (~> 1.5.2)
   rack-test
   rails-observers (~> 0.1)
@@ -150,3 +145,6 @@ DEPENDENCIES
   timecop
   unicorn
   yajl-ruby
+
+BUNDLED WITH
+   1.11.2
