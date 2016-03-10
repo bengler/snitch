@@ -480,6 +480,15 @@ describe 'API v1' do
       result = JSON.parse(last_response.body)
       expect(result['items'][0]['item']['uid']).to eq 'snitchitem.thing:testrealm$1'
     end
+
+    it "allows to specify identity for action which is another than current_identity" do
+      post "/items/thing:testrealm$1/actions", :action => {:kind => 'seen', :identity => 333}
+
+      get "/items/thing:testrealm$1/actions"
+      result = JSON.parse(last_response.body)
+      expect(result['actions'][0]['action']['identity']).to eq 333
+    end
+
   end
 
   describe "counts" do

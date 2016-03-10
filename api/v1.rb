@@ -197,6 +197,13 @@ class SnitchV1 < Sinatra::Base
     query = Pebbles::Uid.query(uid) if uid
     require_action_allowed(:create, uid) if query.oid
 
+    identity_id = current_identity.id
+
+    # Let a god identity specify which identity is making this action
+    if current_identity.god? and params[:action][:identity]
+      identity_id = params[:action][:identity]
+    end
+
     halt 400, "No action given with request" unless params[:action]
     halt 400, "Decision must be one of #{Action::KINDS.join(', ')}." unless Action::KINDS.include?(params[:action][:kind])
 
@@ -205,7 +212,7 @@ class SnitchV1 < Sinatra::Base
       ActiveRecord::Base.connection.transaction do
         item = Item.find_or_create_by_external_uid(uid)
         action = Action.create!(params[:action].merge(
-          :item => item, :identity => current_identity.id))
+          :item => item, :identity => identity_id))
       end
       pg :action, :locals => {:action => action}
     else
@@ -220,11 +227,11 @@ class SnitchV1 < Sinatra::Base
         if kind == 'seen'
           items.update_all("seen = true")
         elsif Item::DECISIONS.include?(kind)
-          items.update_all("seen = true, desicion = '#{kind}', decider = #{current_identity.id}")
+          items.update_all("seen = true, desicion = '#{kind}', decider = #{identity_id}")
         end
         item = items.first
         action = Action.create!(params[:action].merge(
-            :item => item, :identity => current_identity.id))
+            :item => item, :identity => identity_id))
         pg :action, :locals => {:action => action}
       else
         halt 404, "No items found for #{uid}"
