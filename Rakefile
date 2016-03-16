@@ -8,15 +8,14 @@ task :environment do
   require 'config/environment'
 end
 
-# TODO: This exists only so CI server will find the task. Change CI
-#   script so we don't need it.  desc "purge expired claims"
-namespace :test do
-  desc "Prepare test database."
-  task :prepare
-end
-
 namespace :db do
 
+  # TODO: This exists only so CI server will find the task. Change CI
+  #   script so we don't need it.  desc "purge expired claims"
+  namespace :test do
+    desc "Prepare test database."
+    task :prepare
+  end
 
   desc "bootstrap db user, recreate, run migrations"
   task :bootstrap do
