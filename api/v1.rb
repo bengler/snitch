@@ -86,7 +86,7 @@ class SnitchV1 < Sinatra::Base
       # guaranatee exact same output order as input order
       uids = query.list
       items = []
-      uids.each { |uid| items << (item = Item.find_by_external_uid(uid); item ? item : {})}
+      uids.each { |uid| items << (item = Item.find_by_external_uid(uid); item ? item : nil)}
       pagination = {:limit => items.count, :offset => 0, :last_page => true}
       return pg :items, :locals => {:items => items, :pagination => pagination}
     else

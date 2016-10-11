@@ -1,3 +1,7 @@
-node :item => item do
-  attributes :uid, :external_uid, :report_count, :decision, :decider, :created_at, :updated_at, :action_at
+if item
+  node :item => item do
+    attributes :uid, :external_uid, :report_count, :decision, :decider, :created_at, :updated_at, :action_at
+  end
+else
+  node :item => nil
 end

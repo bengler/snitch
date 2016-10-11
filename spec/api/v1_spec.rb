@@ -205,8 +205,8 @@ describe 'API v1' do
 
       get "/items/klass1:apdm.calendar$1,klass2:apdm.calendar$2,klass2:apdm.blogs$3,klass2:apdm.blogs$4"
       expect(JSON.parse(last_response.body)['items'].size).to eq 4
-      expect(JSON.parse(last_response.body)['items'].last['uid']).to be_nil
-      expect(JSON.parse(last_response.body)['items'].select {|i| i['item']['uid'] == nil}.size).to eq 1
+      expect(JSON.parse(last_response.body)['items'].last['item']).to be_nil
+      expect(JSON.parse(last_response.body)['items'].select {|i| i['item'] == nil}.size).to eq 1
     end
 
     it "supports querying items by species query" do
