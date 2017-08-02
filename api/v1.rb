@@ -92,7 +92,8 @@ class SnitchV1 < Sinatra::Base
     else
       klasses = extract_klasses_from_query(query)
       params[:scope] ||= 'pending'
-      items = Item.by_path(query.path).order("#{sort_by_from_params} #{order_from_params}")
+      items = Item.by_path(query.path)
+      items = items.order("#{sort_by_from_params} #{order_from_params}, id") # ID is needed here to avoid Postgres of using wrong index
       items = items.where(:klass => klasses) if klasses.any?
       items = items.where(:klass => query.species) if query.species? and !klasses.any?
       items = get_items_from_scope(params[:scope], items)
