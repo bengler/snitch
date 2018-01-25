@@ -10,9 +10,8 @@ describe 'API v1' do
   end
 
   let(:checkpoint) {
-    double(:service_url => 'http://example.com')
+    double(:service_url => 'http://snitch.dev')
   }
-
   let(:group_user) {
     DeepStruct.wrap(:identity => {:realm => 'testrealm', :id => 1, :god => false})
   }
@@ -22,6 +21,7 @@ describe 'API v1' do
   let(:access_denied) {
     DeepStruct.wrap(:allowed => false)
   }
+
   context "with a logged in user that is allowed through checkpoint psm2 callback" do
 
     before(:each) do
